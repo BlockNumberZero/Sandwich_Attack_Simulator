@@ -1,774 +1,1174 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sandwich Attack Simulator</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/recharts/umd/Recharts.min.js"></script>
-  <style>
-    body {
-      background-color: #0a0a0a;
-      color: white;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    }
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem;
-    }
-    .card {
-      background-color: #1a1a1a;
-      border-radius: 0.5rem;
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-    }
-    .input-group {
-      margin-bottom: 1rem;
-    }
-    .input-label {
-      display: block;
-      color: #a0aec0;
-      margin-bottom: 0.5rem;
-    }
-    .input-field {
-      width: 100%;
-      background-color: #2d3748;
-      color: white;
-      padding: 0.5rem;
-      border-radius: 0.25rem;
-      border: none;
-    }
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-    }
-    .grid-3 {
-      display: grid;
-      grid-template-columns: 1fr 2fr;
-      gap: 1.5rem;
-    }
-    .chart-container {
-      height: 300px;
-      margin-bottom: 1rem;
-    }
-    .data-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      margin-bottom: 0.5rem;
-    }
-    .data-label {
-      color: #a0aec0;
-      display: flex;
-      align-items: center;
-    }
-    .data-value {
-      text-align: right;
-      font-family: 'Arial', sans-serif;
-      font-weight: 600;
-    }
-    .text-red {
-      color: #f56565;
-    }
-    .text-green {
-      color: #48bb78;
-    }
-    .math-breakdown {
-      background-color: #2d3748;
-      padding: 1rem;
-      border-radius: 0.25rem;
-      font-family: 'Arial', sans-serif;
-      font-size: 0.875rem;
-      margin-top: 1rem;
-    }
-    h1 {
-      font-size: 2.25rem;
-      font-weight: bold;
-      text-align: center;
-      margin-bottom: 0.5rem;
-    }
-    h2 {
-      font-size: 1.5rem;
-      font-weight: bold;
-      margin-bottom: 1rem;
-    }
-    h3 {
-      font-size: 1.25rem;
-      margin-bottom: 0.5rem;
-    }
-    .subtitle {
-      text-align: center;
-      color: #a0aec0;
-      margin-bottom: 2rem;
-    }
-    .footer {
-      text-align: center;
-      color: #718096;
-      font-size: 0.875rem;
-      margin-top: 2rem;
-    }
-    .tooltip {
-      position: relative;
-      display: inline-block;
-      cursor: help;
-      margin-left: 5px;
-    }
-    .tooltip .tooltip-text {
-      visibility: hidden;
-      width: 250px;
-      background-color: #333;
-      color: #fff;
-      text-align: left;
-      border-radius: 6px;
-      padding: 8px;
-      position: absolute;
-      z-index: 1;
-      bottom: 125%;
-      left: 50%;
-      margin-left: -125px;
-      opacity: 0;
-      transition: opacity 0.3s;
-      font-size: 0.8rem;
-      line-height: 1.4;
-    }
-    .tooltip:hover .tooltip-text {
-      visibility: visible;
-      opacity: 1;
-    }
-    .transaction-mode {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 1rem;
-    }
-    .transaction-mode button {
-      background-color: #2d3748;
-      color: white;
-      padding: 0.5rem 1rem;
-      border-radius: 0.25rem;
-      border: none;
-      cursor: pointer;
-    }
-    .transaction-mode button.active {
-      background-color: #4299e1;
-    }
-    .gas-fee-breakdown {
-      background-color: rgba(66, 153, 225, 0.1);
-      border-left: 3px solid #4299e1;
-      padding: 0.5rem;
-      margin-top: 0.5rem;
-      font-size: 0.875rem;
-    }
-    .revert-warning {
-      background-color: rgba(245, 101, 101, 0.1);
-      border-left: 3px solid #f56565;
-      padding: 0.5rem;
-      margin-top: 0.5rem;
-      font-size: 0.875rem;
-      color: #f56565;
-    }
-    .pool-state-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-      font-size: 0.875rem;
-    }
-    .pool-state-table th, .pool-state-table td {
-      padding: 0.5rem;
-      text-align: right;
-      border-bottom: 1px solid #2d3748;
-    }
-    .pool-state-table th:first-child, .pool-state-table td:first-child {
-      text-align: left;
-    }
-    .pool-state-table th {
-      color: #a0aec0;
-      font-weight: normal;
-    }
-    /* Use a font that displays zeros without a slash */
-    .zero-fix {
-      font-family: 'Arial', sans-serif;
-    }
-    
-    /* Slider styles */
-    .slider-container {
-      margin-top: 0.5rem;
-    }
-    .slider {
-      -webkit-appearance: none;
-      width: 100%;
-      height: 8px;
-      border-radius: 5px;
-      background: #2d3748;
-      outline: none;
-      margin-top: 0.5rem;
-    }
-    .slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: #4299e1;
-      cursor: pointer;
-    }
-    .slider::-moz-range-thumb {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: #4299e1;
-      cursor: pointer;
-    }
-    
-    /* Depth chart styles */
-    .depth-chart-container {
-      height: 200px;
-      margin-top: 1rem;
-      position: relative;
-    }
-    .depth-chart {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(to right, 
-        rgba(245, 101, 101, 0.1) 0%, 
-        rgba(245, 101, 101, 0.05) 45%, 
-        rgba(72, 187, 120, 0.05) 55%, 
-        rgba(72, 187, 120, 0.1) 100%
-      );
-      border-radius: 4px;
-    }
-    .depth-chart-line {
-      position: absolute;
-      top: 0;
-      left: 50%;
-      width: 1px;
-      height: 100%;
-      background-color: rgba(255, 255, 255, 0.2);
-    }
-    .depth-chart-label {
-      position: absolute;
-      color: #a0aec0;
-      font-size: 0.75rem;
-    }
-    .depth-chart-attack {
-      position: absolute;
-      top: 20%;
-      left: 30%;
-      width: 40%;
-      height: 60%;
-      border: 1px dashed rgba(245, 101, 101, 0.5);
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: rgba(245, 101, 101, 0.8);
-      font-size: 0.75rem;
-    }
-    
-    /* Multi-transaction styles */
-    .transaction-tabs {
-      display: flex;
-      margin-bottom: 1rem;
-      border-bottom: 1px solid #2d3748;
-    }
-    .transaction-tab {
-      padding: 0.5rem 1rem;
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-    }
-    .transaction-tab.active {
-      border-bottom: 2px solid #4299e1;
-      color: #4299e1;
-    }
-    
-    /* Unprofitable warning */
-    .unprofitable-warning {
-      background-color: rgba(245, 158, 11, 0.1);
-      border-left: 3px solid #f59e0b;
-      padding: 0.5rem;
-      margin-top: 0.5rem;
-      font-size: 0.875rem;
-      color: #f59e0b;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sandwich Attack Simulator</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 </head>
-<body>
-  <div class="container">
-    <header>
-      <h1>Sandwich Attack Simulator</h1>
-      <p class="subtitle">Understand how sandwich attacks work in decentralized exchanges</p>
-    </header>
-
-    <div class="transaction-mode">
-      <button class="active">Single Transaction</button>
-      <button>Multi-Transaction Simulation</button>
-    </div>
-
-    <div class="grid-3">
-      <div>
-        <div class="card">
-          <h2>Pool Parameters</h2>
-          <div class="input-group">
-            <label class="input-label">Initial ETH Reserve</label>
-            <input type="number" value="10000" class="input-field" id="initialEthReserve">
-            <div class="slider-container">
-              <input type="range" min="1000" max="100000" value="10000" class="slider" id="initialEthReserveSlider">
-            </div>
-          </div>
-          <div class="input-group">
-            <label class="input-label">Initial TOKEN Reserve</label>
-            <input type="number" value="1000000" class="input-field" id="initialTokenReserve">
-            <div class="slider-container">
-              <input type="range" min="100000" max="10000000" value="1000000" class="slider" id="initialTokenReserveSlider">
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <h2>Victim Parameters</h2>
-          <div class="input-group">
-            <label class="input-label">ETH Amount to Swap</label>
-            <input type="number" value="98" class="input-field" id="victimEthAmount">
-            <div class="slider-container">
-              <input type="range" min="1" max="200" value="98" class="slider" id="victimEthAmountSlider">
-            </div>
-          </div>
-          <div class="input-group">
-            <label class="input-label">Slippage Tolerance (%)</label>
-            <input type="number" value="0.5" step="0.1" class="input-field" id="slippageTolerance">
-            <div class="slider-container">
-              <input type="range" min="0.1" max="5" value="0.5" step="0.1" class="slider" id="slippageToleranceSlider">
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <h2>Attacker Parameters</h2>
-          <div class="input-group">
-            <label class="input-label">ETH Amount for Front-run</label>
-            <input type="number" value="1.73" step="0.01" class="input-field" id="attackerEthAmount">
-            <div class="slider-container">
-              <input type="range" min="0.1" max="10" value="1.73" step="0.01" class="slider" id="attackerEthAmountSlider">
-            </div>
-          </div>
-          <div class="input-group">
-            <label class="input-label">Gas Price (Gwei)</label>
-            <input type="number" value="20" class="input-field" id="gasPrice">
-            <div class="slider-container">
-              <input type="range" min="5" max="100" value="20" class="slider" id="gasPriceSlider">
-            </div>
-          </div>
-          <div class="input-group">
-            <label class="input-label">Gas Units (ETH)</label>
-            <input type="number" value="0.003" step="0.001" class="input-field" id="gasFee">
-            <div class="slider-container">
-              <input type="range" min="0.001" max="0.01" value="0.003" step="0.001" class="slider" id="gasFeeSlider">
-            </div>
-          </div>
-        </div>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-center mb-2">Sandwich Attack Simulator</h1>
+        <h2 class="text-xl text-center mb-8 text-gray-600">Understand how sandwich attacks work in DeFi trading</h2>
         
-        <div class="card">
-          <h2>MEV Concepts</h2>
-          <div class="data-row">
-            <div class="data-label">
-              Maximal Extractable Value (MEV):
-              <div class="tooltip">ℹ️
-                <span class="tooltip-text">The maximum value that can be extracted from block production in excess of the standard block reward and gas fees by including, excluding, and changing the order of transactions in a block.</span>
-              </div>
-            </div>
-            <div class="data-value zero-fix">0.0182 ETH</div>
-          </div>
-          <div class="data-row">
-            <div class="data-label">
-              Priority Gas Auction (PGA):
-              <div class="tooltip">ℹ️
-                <span class="tooltip-text">A competition where traders increase their gas price to get their transactions included earlier in a block, often used in front-running strategies.</span>
-              </div>
-            </div>
-            <div class="data-value zero-fix">20 Gwei</div>
-          </div>
-          <div class="data-row">
-            <div class="data-label">
-              Flashbots:
-              <div class="tooltip">ℹ️
-                <span class="tooltip-text">A research and development organization working on mitigating the negative externalities of MEV extraction, providing private transaction pools to avoid front-running.</span>
-              </div>
-            </div>
-            <div class="data-value">Available</div>
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <div class="card">
-          <h2>Price Impact Visualization</h2>
-          <div class="chart-container" id="chart">
-            <p style="text-align: center; padding-top: 120px;">
-              Interactive chart showing price impact across transaction steps:<br>
-              0% (Initial) → 25% (Front-Run) → 50% (Victim Trade) → 75% (Back-Run) → 100% (Final)
-            </p>
-          </div>
-          <div class="grid-2">
-            <div class="card" style="margin-bottom: 0;">
-              <div class="data-label">Natural slippage without attack:</div>
-              <div class="data-value zero-fix">0.034%</div>
-            </div>
-            <div class="card" style="margin-bottom: 0;">
-              <div class="data-label">Slippage with attack:</div>
-              <div class="data-value zero-fix">0.045%</div>
-            </div>
-          </div>
-          
-          <h3 class="mt-4">Liquidity Depth Chart</h3>
-          <div class="depth-chart-container">
-            <div class="depth-chart">
-              <div class="depth-chart-line"></div>
-              <div class="depth-chart-label" style="top: 10px; left: 10px;">Buy Side</div>
-              <div class="depth-chart-label" style="top: 10px; right: 10px;">Sell Side</div>
-              <div class="depth-chart-label" style="bottom: 10px; left: 50%; transform: translateX(-50%);">Current Price</div>
-              <div class="depth-chart-attack">Sandwich Attack Zone</div>
-            </div>
-          </div>
-          <p class="text-xs text-gray-500 mt-1">This chart shows how liquidity is distributed around the current price. The sandwich attack targets the slippage in this zone.</p>
-        </div>
-
-        <div class="card">
-          <h2>Pool State Updates</h2>
-          <table class="pool-state-table">
-            <thead>
-              <tr>
-                <th>Stage</th>
-                <th>ETH Reserve</th>
-                <th>TOKEN Reserve</th>
-                <th>Price (TOKEN/ETH)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Initial</td>
-                <td class="zero-fix">10000.0000</td>
-                <td class="zero-fix">1000000.00</td>
-                <td class="zero-fix">100.00</td>
-              </tr>
-              <tr>
-                <td>After Front-run</td>
-                <td class="zero-fix">10001.7300</td>
-                <td class="zero-fix">999827.55</td>
-                <td class="zero-fix">99.97</td>
-              </tr>
-              <tr>
-                <td>After Victim</td>
-                <td class="zero-fix">10099.7300</td>
-                <td class="zero-fix">990154.71</td>
-                <td class="zero-fix">98.04</td>
-              </tr>
-              <tr>
-                <td>After Back-run</td>
-                <td class="zero-fix">10098.0000</td>
-                <td class="zero-fix">990327.16</td>
-                <td class="zero-fix">98.07</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="card">
-          <h2>Attack Summary</h2>
-          <div class="grid-2">
-            <div>
-              <h3>Victim Impact</h3>
-              <div class="data-row">
-                <div class="data-label">
-                  Expected Output:
-                  <div class="tooltip">ℹ️
-                    <span class="tooltip-text">The amount of tokens the victim would receive if there was no front-running, based on initial pool state.</span>
-                  </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Parameters Section -->
+            <div class="bg-white p-6 rounded-lg shadow-md col-span-1">
+                <h3 class="text-xl font-semibold mb-4">Parameters</h3>
+                
+                <!-- Price Settings -->
+                <div class="mb-6">
+                    <h4 class="font-medium text-gray-700 mb-2">Price Settings</h4>
+                    <div class="mb-3">
+                        <label class="block text-sm mb-1">ETH / USDC ratio</label>
+                        <input type="range" id="ethPrice" min="1000" max="20000" step="100" value="2000" 
+                               class="w-full h-2 bg-blue-100 rounded-lg appearance-none cursor-pointer">
+                        <div class="flex justify-between text-xs text-gray-500">
+                            <span>1,000</span>
+                            <span id="ethPriceValue">2,000</span>
+                            <span>20,000</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="data-value zero-fix">9676.16 TOKEN</div>
-              </div>
-              <div class="data-row">
-                <div class="data-label">
-                  Actual Output:
-                  <div class="tooltip">ℹ️
-                    <span class="tooltip-text">The amount of tokens the victim actually receives after the front-running transaction has changed the pool state.</span>
-                  </div>
+                
+                <!-- Gas Cost -->
+                <div class="mb-6">
+                    <h4 class="font-medium text-gray-700 mb-2">Gas Cost</h4>
+                    <div class="mb-3">
+                        <label class="block text-sm mb-1">Gas price (Gwei)</label>
+                        <input type="range" id="gasPrice" min="1" max="500" step="1" value="20" 
+                               class="w-full h-2 bg-blue-100 rounded-lg appearance-none cursor-pointer">
+                        <div class="flex justify-between text-xs text-gray-500">
+                            <span>1</span>
+                            <span id="gasPriceValue">20</span>
+                            <span>500</span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="block text-sm mb-1">Gas Cost</label>
+                        <div id="gasCost" class="text-sm font-medium">0.0006 ETH</div>
+                    </div>
                 </div>
-                <div class="data-value zero-fix">9672.84 TOKEN</div>
-              </div>
-              <div class="data-row">
-                <div class="data-label">
-                  Price Impact:
-                  <div class="tooltip">ℹ️
-                    <span class="tooltip-text">The percentage difference between expected and actual output due to the attack: (Expected - Actual) / Expected × 100%</span>
-                  </div>
+                
+                <!-- Liquidity Pool -->
+                <div class="mb-6">
+                    <h4 class="font-medium text-gray-700 mb-2">Liquidity Pool</h4>
+                    <div class="mb-3">
+                        <label class="block text-sm mb-1">Initial ETH Reserve</label>
+                        <input type="range" id="ethReserve" min="10" max="500000" step="10" value="10000" 
+                               class="w-full h-2 bg-blue-100 rounded-lg appearance-none cursor-pointer">
+                        <div class="flex justify-between text-xs text-gray-500">
+                            <span>10</span>
+                            <span id="ethReserveValue">10,000</span>
+                            <span>500K</span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="block text-sm mb-1">Initial USDC Reserve</label>
+                        <input type="range" id="usdcReserve" min="10000" max="10000000000" step="10000" value="20000000" 
+                               class="w-full h-2 bg-blue-100 rounded-lg appearance-none cursor-pointer">
+                        <div class="flex justify-between text-xs text-gray-500">
+                            <span>10K</span>
+                            <span id="usdcReserveValue">20,000,000</span>
+                            <span>10B</span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="block text-sm mb-1">Pool Fee (%)</label>
+                        <input type="range" id="poolFee" min="0.1" max="1" step="0.1" value="0.3" 
+                               class="w-full h-2 bg-blue-100 rounded-lg appearance-none cursor-pointer">
+                        <div class="flex justify-between text-xs text-gray-500">
+                            <span>0.1%</span>
+                            <span id="poolFeeValue">0.3%</span>
+                            <span>1%</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="data-value text-red zero-fix">0.034%</div>
-              </div>
-              <div class="data-row">
-                <div class="data-label">
-                  Slippage Tolerance:
-                  <div class="tooltip">ℹ️
-                    <span class="tooltip-text">The maximum acceptable percentage difference between expected and actual output set by the victim.</span>
-                  </div>
+                
+                <!-- Victim's Trade -->
+                <div class="mb-6">
+                    <h4 class="font-medium text-gray-700 mb-2">Victim's Trade</h4>
+                    <div class="mb-3">
+                        <label class="block text-sm mb-1">Trade Amount (ETH)</label>
+                        <input type="range" id="tradeAmount" min="0.001" max="100" step="0.001" value="1" 
+                               class="w-full h-2 bg-blue-100 rounded-lg appearance-none cursor-pointer">
+                        <div class="flex justify-between text-xs text-gray-500">
+                            <span>0.001</span>
+                            <span id="tradeAmountValue">1</span>
+                            <span>100</span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="block text-sm mb-1">Slippage Tolerance (%)</label>
+                        <input type="range" id="slippageTolerance" min="0.1" max="10" step="0.1" value="0.5" 
+                               class="w-full h-2 bg-blue-100 rounded-lg appearance-none cursor-pointer">
+                        <div class="flex justify-between text-xs text-gray-500">
+                            <span>0.1%</span>
+                            <span id="slippageToleranceValue">0.5%</span>
+                            <span>10%</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="data-value zero-fix">0.5%</div>
-              </div>
-              <div class="data-row">
-                <div class="data-label">
-                  Transaction Status:
+                
+                <!-- Attack Parameters -->
+                <div class="mb-6">
+                    <h4 class="font-medium text-gray-700 mb-2">Attack Parameters</h4>
+                    <div class="mb-3">
+                        <label class="block text-sm mb-1">Front-run amount (ETH)</label>
+                        <input type="range" id="frontRunAmount" min="0.001" max="100" step="0.001" value="0.5" 
+                               class="w-full h-2 bg-blue-100 rounded-lg appearance-none cursor-pointer">
+                        <div class="flex justify-between text-xs text-gray-500">
+                            <span>0.001</span>
+                            <span id="frontRunAmountValue">0.5</span>
+                            <span>100</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="data-value zero-fix text-green">Successful</div>
-              </div>
+                
+                <button id="simulateButton" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    Simulate Attack
+                </button>
+                
+                <div id="debugOutput" class="mt-4 p-3 bg-gray-100 text-xs text-gray-700 rounded overflow-auto max-h-40 hidden">
+                    <h4 class="font-bold mb-1">Debug Output:</h4>
+                    <pre id="debugLog"></pre>
+                </div>
             </div>
             
-            <div>
-              <h3>Attacker Profit</h3>
-              <div class="data-row">
-                <div class="data-label">Front-run Cost:</div>
-                <div class="data-value zero-fix">1.7300 ETH</div>
-              </div>
-              <div class="data-row">
-                <div class="data-label">Back-run Return:</div>
-                <div class="data-value zero-fix">1.7534 ETH</div>
-              </div>
-              <div class="data-row">
-                <div class="data-label">
-                  Gas Cost (Total):
-                  <div class="tooltip">ℹ️
-                    <span class="tooltip-text">Combined gas costs for front-run and back-run transactions</span>
-                  </div>
+            <!-- Results Section -->
+            <div class="col-span-1 md:col-span-2">
+                <!-- Price Impact Visualization -->
+                <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                    <h3 class="text-xl font-semibold mb-4">Price Impact Visualization</h3>
+                    <div class="h-64">
+                        <canvas id="priceImpactChart"></canvas>
+                    </div>
+                    <div id="attackStatus" class="mt-4 p-3 text-center font-medium rounded"></div>
                 </div>
-                <div class="data-value zero-fix">0.0052 ETH</div>
-              </div>
-              <div class="gas-fee-breakdown">
-                <div>Front-run gas: 0.0026 ETH</div>
-                <div>Back-run gas: 0.0026 ETH</div>
-              </div>
-              <div class="data-row">
-                <div class="data-label">
-                  Net Profit:
-                  <div class="tooltip">ℹ️
-                    <span class="tooltip-text">Back-run Return (1.7534) - Front-run Cost (1.7300) - Total Gas Cost (0.0052) = 0.0182 ETH</span>
-                  </div>
+                
+                <!-- Liquidity Depth Chart -->
+                <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                    <h3 class="text-xl font-semibold mb-4">Liquidity Depth Chart</h3>
+                    <div class="h-48">
+                        <canvas id="liquidityDepthChart"></canvas>
+                    </div>
+                    <p class="mt-2 text-sm text-gray-600">This chart shows how liquidity is distributed around the current price. The sandwich attack targets the slippage in this zone.</p>
                 </div>
-                <div class="data-value text-green zero-fix">0.0182 ETH</div>
-              </div>
-              <div class="data-row">
-                <div class="data-label">
-                  ROI:
-                  <div class="tooltip">ℹ️
-                    <span class="tooltip-text">Return on Investment: (Net Profit / Front-run Cost) × 100% = (0.0182 / 1.7300) × 100% = 1.05%</span>
-                  </div>
+                
+                <!-- Pool State Updates -->
+                <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                    <h3 class="text-xl font-semibold mb-4">Pool State Updates</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead>
+                                <tr>
+                                    <th class="px-4 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stage</th>
+                                    <th class="px-4 py-2 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">ETH Reserve</th>
+                                    <th class="px-4 py-2 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">USDC Reserve</th>
+                                    <th class="px-4 py-2 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Price (USDC/ETH)</th>
+                                    <th class="px-4 py-2 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Constant K</th>
+                                </tr>
+                            </thead>
+                            <tbody id="poolStateTableBody" class="divide-y divide-gray-200">
+                                <!-- Will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="data-value text-green zero-fix">1.05%</div>
-              </div>
-              <div class="data-row">
-                <div class="data-label">Profitable after gas:</div>
-                <div class="data-value text-green">Yes</div>
-              </div>
+                
+                <!-- Attack Summary -->
+                <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                    <h3 class="text-xl font-semibold mb-4">Attack Summary</h3>
+                    
+                    <!-- Victim Impact -->
+                    <div class="mb-6">
+                        <h4 class="font-medium text-gray-700 mb-2">Victim Impact</h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm text-gray-600">Expected Output:</p>
+                                <p id="expectedOutput" class="font-medium">-</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Actual Output:</p>
+                                <p id="actualOutput" class="font-medium">-</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Price Impact:</p>
+                                <p id="priceImpact" class="font-medium">-</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Slippage Tolerance:</p>
+                                <p id="slippageDisplay" class="font-medium">-</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Transaction Status:</p>
+                                <p id="transactionStatus" class="font-medium">-</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Attacker's Profit -->
+                    <div>
+                        <h4 class="font-medium text-gray-700 mb-2">Attacker's Profit</h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm text-gray-600">Front-run Cost:</p>
+                                <p id="frontRunCost" class="font-medium">-</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Back-run Return:</p>
+                                <p id="backRunReturn" class="font-medium">-</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Gas Cost (Total):</p>
+                                <p id="totalGasCost" class="font-medium">-</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Net Profit:</p>
+                                <p id="netProfit" class="font-medium">-</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">ROI:</p>
+                                <p id="roi" class="font-medium">-</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Profitable After Gas:</p>
+                                <p id="isProfitable" class="font-medium">-</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button id="toggleExplanation" class="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center">
+                                <span>Why is this attack profitable or not?</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <div id="attackExplanation" class="mt-2 p-3 bg-gray-50 rounded text-sm hidden">
+                                Explanation will appear here after simulation.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Detailed Transaction Breakdown -->
+                <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                    <h3 class="text-xl font-semibold mb-4">Detailed Transaction Breakdown</h3>
+                    
+                    <!-- Front-run Transaction -->
+                    <div class="mb-4">
+                        <button class="toggle-details flex justify-between items-center w-full text-left font-medium py-2 border-b">
+                            <span>Front-run Transaction</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="details-content hidden mt-2">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-sm text-gray-600">ETH Input:</p>
+                                    <p id="frontRunEthInput" class="font-medium">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Fee:</p>
+                                    <p id="frontRunFee" class="font-medium">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">ETH After Fee:</p>
+                                    <p id="frontRunEthAfterFee" class="font-medium">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">USDC Output:</p>
+                                    <p id="frontRunUsdcOutput" class="font-medium">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Calculation:</p>
+                                    <p id="frontRunCalculation" class="font-medium">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">New Pool Price:</p>
+                                    <p id="frontRunNewPrice" class="font-medium">-</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Victim's Transaction -->
+                    <div class="mb-4">
+                        <button class="toggle-details flex justify-between items-center w-full text-left font-medium py-2 border-b">
+                            <span>Victim's Transaction</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="details-content hidden mt-2">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-sm text-gray-600">ETH Input:</p>
+                                    <p id="victimEthInput" class="font-medium">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Fee:</p>
+                                    <p id="victimFee" class="font-medium">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">ETH After Fee:</p>
+                                    <p id="victimEthAfterFee" class="font-medium">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Expected Output (Initial Pool):</p>
+                                    <p id="victimExpectedOutput" class="font-medium">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Actual Output (After Front-run):</p>
+                                    <p id="victimActualOutput" class="font-medium">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Difference:</p>
+                                    <p id="victimDifference" class="font-medium">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Slippage Tolerance:</p>
+                                    <p id="victimSlippageTolerance" class="font-medium">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Transaction Status:</p>
+                                    <p id="victimTransactionStatus" class="font-medium">-</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Back-run Transaction -->
+                    <div class="mb-4">
+                        <button class="toggle-details flex justify-between items-center w-full text-left font-medium py-2 border-b">
+                            <span>Back-run Transaction</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="details-content hidden mt-2">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-sm text-gray-600">USDC Input:</p>
+                                    <p id="backRunUsdcInput" class="font-medium">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Fee:</p>
+                                    <p id="backRunFee" class="font-medium">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">USDC After Fee:</p>
+                                    <p id="backRunUsdcAfterFee" class="font-medium">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">ETH Output:</p>
+                                    <p id="backRunEthOutput" class="font-medium">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Calculation:</p>
+                                    <p id="backRunCalculation" class="font-medium">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Final Pool Price:</p>
+                                    <p id="backRunFinalPrice" class="font-medium">-</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Mathematical Breakdown -->
+                    <div>
+                        <button class="toggle-details flex justify-between items-center w-full text-left font-medium py-2 border-b">
+                            <span>Mathematical Breakdown</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="details-content hidden mt-2">
+                            <div class="mb-3">
+                                <h5 class="font-medium">Constant Product Formula</h5>
+                                <p class="text-sm">The core formula that AMMs use: x * y = k, where x and y are token reserves and k is a constant. For any trade, the product of reserves must remain constant (except for fee accumulation).</p>
+                            </div>
+                            <div class="mb-3">
+                                <h5 class="font-medium">Front-run Calculation</h5>
+                                <p id="mathFrontRun" class="text-sm">tokenOutput = y - k / (x + ethInput * (1 - fee))</p>
+                            </div>
+                            <div class="mb-3">
+                                <h5 class="font-medium">Price Impact Calculation</h5>
+                                <p id="mathPriceImpact" class="text-sm">priceImpact = (expectedOutput - actualOutput) / expectedOutput * 100</p>
+                            </div>
+                            <div>
+                                <h5 class="font-medium">Profit Calculation</h5>
+                                <p id="mathProfit" class="text-sm">profit = backRunEthOutput - frontRunAmount - gasCost</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-
-        <div class="card">
-          <h2>Detailed Transaction Breakdown</h2>
-          
-          <div style="margin-bottom: 1.5rem;">
-            <h3>Front-run Transaction</h3>
-            <div class="data-row">
-              <div class="data-label">ETH Input:</div>
-              <div class="data-value zero-fix">1.7300 ETH</div>
-            </div>
-            <div class="data-row">
-              <div class="data-label">Fee (0.3%):</div>
-              <div class="data-value zero-fix">0.0052 ETH</div>
-            </div>
-            <div class="data-row">
-              <div class="data-label">ETH After Fee:</div>
-              <div class="data-value zero-fix">1.7248 ETH</div>
-            </div>
-            <div class="data-row">
-              <div class="data-label">TOKEN Output:</div>
-              <div class="data-value zero-fix">172.45 TOKEN</div>
-            </div>
-            <div class="data-row">
-              <div class="data-label">Calculation:</div>
-              <div class="data-value zero-fix">172.45 = 1000000 - (10000000000 / (10000 + 1.7248))</div>
-            </div>
-            <div class="data-row">
-              <div class="data-label">New Pool Price</div>
-              <div class="data-value zero-fix">99.97 TOKEN/ETH</div>
-            </div>
-          </div>
-          
-          <div style="margin-bottom: 1.5rem;">
-            <h3>Victim's Transaction</h3>
-            <div class="data-row">
-              <div class="data-label">ETH Input:</div>
-              <div class="data-value zero-fix">98.0000 ETH</div>
-            </div>
-            <div class="data-row">
-              <div class="data-label">Fee (0.3%):</div>
-              <div class="data-value zero-fix">0.2940 ETH</div>
-            </div>
-            <div class="data-row">
-              <div class="data-label">ETH After Fee:</div>
-              <div class="data-value zero-fix">97.7060 ETH</div>
-            </div>
-            <div class="data-row">
-              <div class="data-label">Expected Output (Initial Pool):</div>
-              <div class="data-value zero-fix">9676.16 TOKEN</div>
-            </div>
-            <div class="data-row">
-              <div class="data-label">Actual Output (After Front-run):</div>
-              <div class="data-value zero-fix">9672.84 TOKEN</div>
-            </div>
-            <div class="data-row">
-              <div class="data-label">Difference:</div>
-              <div class="data-value zero-fix">3.32 TOKEN</div>
-            </div>
-            <div class="data-row">
-              <div class="data-label">Price Impact:</div>
-              <div class="data-value zero-fix">0.034%</div>
-            </div>
-            <div class="data-row">
-              <div class="data-label">Slippage Tolerance:</div>
-              <div class="data-value zero-fix">0.5%</div>
-            </div>
-            <div class="data-row">
-              <div class="data-label">Transaction Status:</div>
-              <div class="data-value text-green">Successful (Impact < Tolerance)</div>
-            </div>
-          </div>
-          
-          <div style="margin-bottom: 1.5rem;">
-            <h3>Back-run Transaction</h3>
-            <div class="data-row">
-              <div class="data-label">TOKEN Input:</div>
-              <div class="data-value zero-fix">172.45 TOKEN</div>
-            </div>
-            <div class="data-row">
-              <div class="data-label">Fee (0.3%):</div>
-              <div class="data-value zero-fix">0.52 TOKEN</div>
-            </div>
-            <div class="data-row">
-              <div class="data-label">TOKEN After Fee:</div>
-              <div class="data-value zero-fix">171.93 TOKEN</div>
-            </div>
-            <div class="data-row">
-              <div class="data-label">ETH Output:</div>
-              <div class="data-value zero-fix">1.7534 ETH</div>
-            </div>
-            <div class="data-row">
-              <div class="data-label">Calculation:</div>
-              <div class="data-value zero-fix">1.7534 = 10099.73 - (10000000000 / (990154.71 + 171.93))</div>
-            </div>
-            <div class="data-row">
-              <div class="data-label">Final Pool Price</div>
-              <div class="data-value zero-fix">98.07 TOKEN/ETH</div>
-            </div>
-          </div>
-          
-          <div>
-            <h3>Mathematical Breakdown</h3>
-            <div class="math-breakdown">
-              <p style="margin-bottom: 0.5rem;">
-                <strong>Constant Product Formula</strong> 
-                <span class="tooltip">ℹ️
-                  <span class="tooltip-text">The core formula that AMMs use: x * y = k, where x and y are token reserves and k is a constant. For any trade, the product of reserves must remain constant.</span>
-                </span><br>
-                x * y = k<br>
-                10000 ETH * 1000000 TOKEN = 10000000000
-              </p>
-              
-              <p style="margin-bottom: 0.5rem;">
-                <strong>Front-run Calculation</strong><br>
-                tokenOutput = y - k / (x + ethInput)<br>
-                172.45 = 1000000 - 10000000000 / (10000 + 1.7248)
-              </p>
-              
-              <p style="margin-bottom: 0.5rem;">
-                <strong>Price Impact Calculation</strong> 
-                <span class="tooltip">ℹ️
-                  <span class="tooltip-text">How much the trade affects the price in the liquidity pool. Calculated as the percentage difference between expected and actual output.</span>
-                </span><br>
-                priceImpact = (expectedOutput - actualOutput) / expectedOutput * 100<br>
-                0.034% = (9676.16 - 9672.84) / 9676.16 * 100
-              </p>
-              
-              <p>
-                <strong>Profit Calculation</strong> 
-                <span class="tooltip">ℹ️
-                  <span class="tooltip-text">Step-by-step profit calculation:
-1. Front-run cost: 1.7300 ETH
-2. Back-run return: 1.7534 ETH
-3. Gas costs: 0.0052 ETH
-4. Net profit: 1.7534 - 1.7300 - 0.0052 = 0.0182 ETH</span>
-                </span><br>
-                profit = backRunEthOutput - frontRunAmount - gasCost<br>
-                0.0182 = 1.7534 - 1.7300 - 0.0052
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
 
-    <footer class="footer">
-      <p>Educational tool for understanding sandwich attacks in DeFi</p>
-      <p>© 2025 Web3 Education</p>
-    </footer>
-  </div>
-
-  <script>
-    // This is a static demonstration of the improved simulator
-    // The actual implementation would use React and include interactive functionality
-    document.addEventListener('DOMContentLoaded', function() {
-      // Connect sliders to input fields
-      const sliders = document.querySelectorAll('.slider');
-      sliders.forEach(slider => {
-        const inputId = slider.id.replace('Slider', '');
-        const input = document.getElementById(inputId);
+    <script>
+        // Enable debug mode - set to true to show debug output
+        const DEBUG = true;
         
-        // Set initial slider value from input
-        slider.value = input.value;
-        
-        // Update input when slider changes
-        slider.addEventListener('input', function() {
-          input.value = this.value;
-        });
-        
-        // Update slider when input changes
-        input.addEventListener('change', function() {
-          slider.value = this.value;
-        });
-      });
+        // Debug logger function
+        function log(message) {
+            if (DEBUG) {
+                console.log(message);
+                
+                const debugOutput = document.getElementById('debugOutput');
+                const debugLog = document.getElementById('debugLog');
+                
+                debugOutput.classList.remove('hidden');
+                debugLog.textContent += message + '\n';
+                
+                // Auto-scroll to bottom
+                debugLog.scrollTop = debugLog.scrollHeight;
+            }
+        }
 
-      // Update values when inputs change
-      const inputs = document.querySelectorAll('input[type="number"]');
-      inputs.forEach(input => {
-        input.addEventListener('change', function() {
-          // In a real implementation, this would recalculate all values
-          alert('In the full implementation, this would recalculate all values based on your input.');
-        });
-      });
+        // Format numbers with commas and specified decimals
+        function formatNumber(num, decimals = 4) {
+            if (num === undefined || num === null || isNaN(num)) return '-';
+            
+            // For very small numbers near zero
+            if (Math.abs(num) < 0.0001 && num !== 0) {
+                return num.toExponential(4);
+            }
+            
+            // Handle different formats based on size
+            let formatted;
+            if (Math.abs(num) >= 1000000) {
+                formatted = (num / 1000000).toFixed(2) + 'M';
+            } else if (Math.abs(num) >= 1000) {
+                formatted = (num / 1000).toFixed(2) + 'K';
+            } else {
+                formatted = num.toFixed(decimals);
+            }
+            
+            // Add commas for thousands separators
+            return formatted.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
 
-      // Transaction mode buttons
-      const modeButtons = document.querySelectorAll('.transaction-mode button');
-      modeButtons.forEach(button => {
-        button.addEventListener('click', function() {
-          modeButtons.forEach(btn => btn.classList.remove('active'));
-          this.classList.add('active');
-          alert('In the full implementation, this would switch between transaction modes.');
+        // Update input value displays
+        function updateValueDisplays() {
+            document.getElementById('ethPriceValue').textContent = formatNumber(parseFloat(document.getElementById('ethPrice').value), 0);
+            document.getElementById('gasPriceValue').textContent = document.getElementById('gasPrice').value;
+            document.getElementById('ethReserveValue').textContent = formatNumber(parseFloat(document.getElementById('ethReserve').value), 0);
+            document.getElementById('usdcReserveValue').textContent = formatNumber(parseFloat(document.getElementById('usdcReserve').value), 0);
+            document.getElementById('poolFeeValue').textContent = document.getElementById('poolFee').value + '%';
+            document.getElementById('tradeAmountValue').textContent = document.getElementById('tradeAmount').value;
+            document.getElementById('slippageToleranceValue').textContent = document.getElementById('slippageTolerance').value + '%';
+            document.getElementById('frontRunAmountValue').textContent = document.getElementById('frontRunAmount').value;
+            
+            // Update gas cost
+            const gasPrice = parseFloat(document.getElementById('gasPrice').value);
+            const gasUnits = 150000; // Approximate gas units for a swap
+            const gasCostETH = (gasPrice * gasUnits) / 1e9; // Convert from Gwei to ETH
+            document.getElementById('gasCost').textContent = `${formatNumber(gasCostETH, 6)} ETH`;
+            
+            log('Updated value displays');
+        }
+
+        // Get simulation parameters from the UI
+        function getParameters() {
+            return {
+                ethPrice: parseFloat(document.getElementById('ethPrice').value),
+                gasPrice: parseFloat(document.getElementById('gasPrice').value),
+                ethReserve: parseFloat(document.getElementById('ethReserve').value),
+                usdcReserve: parseFloat(document.getElementById('usdcReserve').value),
+                poolFee: parseFloat(document.getElementById('poolFee').value) / 100, // Convert percentage to decimal
+                tradeAmount: parseFloat(document.getElementById('tradeAmount').value),
+                slippageTolerance: parseFloat(document.getElementById('slippageTolerance').value) / 100, // Convert percentage to decimal
+                frontRunAmount: parseFloat(document.getElementById('frontRunAmount').value)
+            };
+        }
+
+        // Calculate output amount for a given input with proper fee handling
+        function getOutputAmountWithFee(inputAmount, inputReserve, outputReserve, fee) {
+            log(`Calculating output for: input=${inputAmount}, inputReserve=${inputReserve}, outputReserve=${outputReserve}, fee=${fee}`);
+            
+            // Calculate fee amount
+            const feeAmount = inputAmount * fee;
+            log(`Fee amount: ${feeAmount}`);
+            
+            // Input amount after fee deduction (for output calculation)
+            const inputAmountAfterFee = inputAmount - feeAmount;
+            log(`Input after fee: ${inputAmountAfterFee}`);
+            
+            // Calculate constant product before trade
+            const k = inputReserve * outputReserve;
+            log(`Initial k: ${k}`);
+            
+            // Calculate new input reserve (full input amount is added)
+            const newInputReserve = inputReserve + inputAmount;
+            log(`New input reserve: ${newInputReserve}`);
+            
+            // Calculate new output reserve based on the constant product formula
+            // Using input amount minus fee for the calculation
+            const newOutputReserve = k / (inputReserve + inputAmountAfterFee);
+            log(`New output reserve: ${newOutputReserve}`);
+            
+            // Calculate output amount
+            const outputAmount = outputReserve - newOutputReserve;
+            log(`Output amount: ${outputAmount}`);
+            
+            // Calculate new constant product (increases due to fee)
+            const newK = newInputReserve * newOutputReserve;
+            log(`New k: ${newK} (should be greater than initial k due to fees)`);
+            
+            return {
+                outputAmount: outputAmount,
+                newInputReserve: newInputReserve,
+                newOutputReserve: newOutputReserve,
+                oldK: k,
+                newK: newK,
+                feeAmount: feeAmount
+            };
+        }
+
+        // Simulate front-run transaction
+        function simulateFrontRun(ethReserve, usdcReserve, frontRunAmount, poolFee) {
+            log('Simulating front-run transaction');
+            log(`Initial state: ETH=${ethReserve}, USDC=${usdcReserve}, amount=${frontRunAmount}, fee=${poolFee}`);
+            
+            // Calculate ETH to USDC swap
+            const result = getOutputAmountWithFee(
+                frontRunAmount,  // ETH input
+                ethReserve,      // ETH reserve
+                usdcReserve,     // USDC reserve
+                poolFee          // Pool fee
+            );
+            
+            log(`Front-run result: ETH input=${frontRunAmount}, USDC output=${result.outputAmount}`);
+            log(`New reserves: ETH=${result.newInputReserve}, USDC=${result.newOutputReserve}`);
+            
+            return {
+                ethInput: frontRunAmount,
+                fee: frontRunAmount * poolFee,
+                ethAfterFee: frontRunAmount - (frontRunAmount * poolFee),
+                usdcOutput: result.outputAmount,
+                newEthReserve: result.newInputReserve,
+                newUsdcReserve: result.newOutputReserve,
+                oldK: result.oldK,
+                newK: result.newK
+            };
+        }
+
+        // Simulate victim's transaction
+        function simulateVictimTrade(ethReserve, usdcReserve, tradeAmount, poolFee, slippageTolerance, originalEthReserve, originalUsdcReserve) {
+            log('Simulating victim transaction');
+            log(`Initial state: ETH=${ethReserve}, USDC=${usdcReserve}, amount=${tradeAmount}, fee=${poolFee}`);
+            log(`Original state (for expected output): ETH=${originalEthReserve}, USDC=${originalUsdcReserve}`);
+            
+            // Calculate expected output if there was no front-running
+            const expectedResult = getOutputAmountWithFee(
+                tradeAmount,
+                originalEthReserve,
+                originalUsdcReserve,
+                poolFee
+            );
+            
+            log(`Expected output (no front-run): ${expectedResult.outputAmount} USDC`);
+            
+            // Calculate actual output after front-running
+            const actualResult = getOutputAmountWithFee(
+                tradeAmount,
+                ethReserve,
+                usdcReserve,
+                poolFee
+            );
+            
+            log(`Actual output (after front-run): ${actualResult.outputAmount} USDC`);
+            
+            // Calculate price impact
+            const priceImpact = 
+                (expectedResult.outputAmount - actualResult.outputAmount) / 
+                expectedResult.outputAmount * 100;
+            
+            log(`Price impact: ${priceImpact.toFixed(6)}%`);
+            
+            // Determine if transaction succeeds based on slippage tolerance
+            const transactionSucceeds = priceImpact <= (slippageTolerance * 100);
+            log(`Transaction succeeds: ${transactionSucceeds} (impact: ${priceImpact.toFixed(6)}%, tolerance: ${(slippageTolerance * 100).toFixed(2)}%)`);
+            
+            return {
+                ethInput: tradeAmount,
+                fee: tradeAmount * poolFee,
+                ethAfterFee: tradeAmount - (tradeAmount * poolFee),
+                expectedOutput: expectedResult.outputAmount,
+                actualOutput: actualResult.outputAmount,
+                difference: expectedResult.outputAmount - actualResult.outputAmount,
+                priceImpact: priceImpact,
+                transactionSucceeds: transactionSucceeds,
+                newEthReserve: transactionSucceeds ? actualResult.newInputReserve : ethReserve,
+                newUsdcReserve: transactionSucceeds ? actualResult.newOutputReserve : usdcReserve,
+                oldK: actualResult.oldK,
+                newK: transactionSucceeds ? actualResult.newK : actualResult.oldK
+            };
+        }
+
+        // Simulate back-run transaction
+        function simulateBackRun(ethReserve, usdcReserve, usdcInput, poolFee) {
+            log('Simulating back-run transaction');
+            log(`Initial state: ETH=${ethReserve}, USDC=${usdcReserve}, USDC input=${usdcInput}, fee=${poolFee}`);
+            
+            // Calculate USDC to ETH swap
+            const result = getOutputAmountWithFee(
+                usdcInput,      // USDC input
+                usdcReserve,    // USDC reserve
+                ethReserve,     // ETH reserve
+                poolFee         // Pool fee
+            );
+            
+            log(`Back-run result: USDC input=${usdcInput}, ETH output=${result.outputAmount}`);
+            log(`New reserves: USDC=${result.newInputReserve}, ETH=${result.newOutputReserve}`);
+            
+            return {
+                usdcInput: usdcInput,
+                fee: usdcInput * poolFee,
+                usdcAfterFee: usdcInput - (usdcInput * poolFee),
+                ethOutput: result.outputAmount,
+                newUsdcReserve: result.newInputReserve,
+                newEthReserve: result.newOutputReserve,
+                oldK: result.oldK,
+                newK: result.newK
+            };
+        }
+
+        // Calculate profit
+        function calculateProfit(frontRunCost, backRunReturn, gasPrice) {
+            log('Calculating profit');
+            log(`Front-run cost: ${frontRunCost}, back-run return: ${backRunReturn}, gas price: ${gasPrice}`);
+            
+            // Standard gas units for a swap
+            const gasUsedFrontRun = 150000;
+            const gasUsedBackRun = 150000;
+            
+            // Convert gas price from Gwei to ETH
+            const frontRunGasCost = (gasPrice * gasUsedFrontRun) / 1e9;
+            const backRunGasCost = (gasPrice * gasUsedBackRun) / 1e9;
+            const totalGasCost = frontRunGasCost + backRunGasCost;
+            
+            log(`Gas costs: front-run=${frontRunGasCost}, back-run=${backRunGasCost}, total=${totalGasCost}`);
+            
+            // Calculate net profit
+            const netProfit = backRunReturn - frontRunCost - totalGasCost;
+            log(`Net profit: ${netProfit}`);
+            
+            // Calculate ROI
+            let roi = 0;
+            if (frontRunCost > 0) {
+                roi = (netProfit / frontRunCost) * 100;
+            }
+            log(`ROI: ${roi}%`);
+            
+            return {
+                frontRunGasCost: frontRunGasCost,
+                backRunGasCost: backRunGasCost,
+                totalGasCost: totalGasCost,
+                netProfit: netProfit,
+                roi: roi,
+                isProfitable: netProfit > 0
+            };
+        }
+
+        // Initialize charts
+        let priceImpactChart = null;
+        let liquidityDepthChart = null;
+
+        function initializeCharts() {
+            // Price Impact Chart
+            const priceImpactCtx = document.getElementById('priceImpactChart').getContext('2d');
+            priceImpactChart = new Chart(priceImpactCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Initial', 'Front-run', 'Victim Trade', 'Back-run'],
+                    datasets: [
+                        {
+                            label: 'Natural Price',
+                            data: [0, 0, 0, 0],
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            tension: 0.1,
+                            fill: false
+                        },
+                        {
+                            label: 'Sandwich Attack Price',
+                            data: [0, 0, 0, 0],
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            tension: 0.1,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Price (USDC/ETH)'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Liquidity Depth Chart
+            const liquidityDepthCtx = document.getElementById('liquidityDepthChart').getContext('2d');
+            liquidityDepthChart = new Chart(liquidityDepthCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Buy Side', 'Current Price', 'Sell Side'],
+                    datasets: [{
+                        label: 'Liquidity',
+                        data: [0, 0, 0],
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(255, 99, 132, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(255, 99, 132, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Liquidity Depth'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            log('Charts initialized');
+        }
+
+        // Update price impact chart
+        function updatePriceImpactChart(stages) {
+            log('Updating price impact chart');
+            
+            // Calculate data points for natural price without attack
+            const naturalPricePoints = [];
+            naturalPricePoints.push(stages[0].usdcReserve / stages[0].ethReserve);
+            
+            // Calculate data for victim trade without front-run
+            const victimTradeResult = getOutputAmountWithFee(
+                getParameters().tradeAmount,
+                stages[0].ethReserve,
+                stages[0].usdcReserve,
+                getParameters().poolFee
+            );
+            
+            const naturalPriceAfterVictim = victimTradeResult.newOutputReserve / victimTradeResult.newInputReserve;
+            naturalPricePoints.push(naturalPricePoints[0]); // Hold steady to front-run point
+            naturalPricePoints.push(naturalPriceAfterVictim); // Drop at victim trade
+            naturalPricePoints.push(naturalPriceAfterVictim); // Stay at final price
+            
+            log(`Natural price points: ${JSON.stringify(naturalPricePoints)}`);
+            
+            // Calculate data points for attack price
+            const attackPricePoints = [];
+            
+            for (let i = 0; i < stages.length; i++) {
+                attackPricePoints.push(stages[i].usdcReserve / stages[i].ethReserve);
+            }
+            
+            log(`Attack price points: ${JSON.stringify(attackPricePoints)}`);
+            
+            // Update chart data
+            priceImpactChart.data.datasets[0].data = naturalPricePoints;
+            priceImpactChart.data.datasets[1].data = attackPricePoints;
+            priceImpactChart.update();
+            
+            log('Price impact chart updated');
+        }
+
+        // Update liquidity depth chart
+        function updateLiquidityDepthChart(stages, victimResult) {
+            log('Updating liquidity depth chart');
+            
+            const initialPrice = stages[0].usdcReserve / stages[0].ethReserve;
+            const priceAfterFrontRun = stages[1].usdcReserve / stages[1].ethReserve;
+            
+            // Calculate liquidity on buy and sell sides
+            const buySideLiquidity = stages[0].ethReserve * 0.5; // Simplified representation
+            const sellSideLiquidity = stages[0].usdcReserve / initialPrice * 0.5; // Convert to ETH equivalent
+            
+            // Calculate sandwich zone based on price impact
+            const sandwichZone = victimResult.priceImpact * sellSideLiquidity / 100;
+            
+            // Update chart data
+            liquidityDepthChart.data.datasets[0].data = [buySideLiquidity, sandwichZone, sellSideLiquidity];
+            liquidityDepthChart.update();
+            
+            log('Liquidity depth chart updated');
+        }
+
+        // Update pool state table
+        function updatePoolStateTable(stages) {
+            log('Updating pool state table');
+            
+            const tableBody = document.getElementById('poolStateTableBody');
+            tableBody.innerHTML = '';
+            
+            stages.forEach(stage => {
+                const row = document.createElement('tr');
+                
+                const stageCell = document.createElement('td');
+                stageCell.textContent = stage.name;
+                stageCell.className = 'px-4 py-2';
+                row.appendChild(stageCell);
+                
+                const ethReserveCell = document.createElement('td');
+                ethReserveCell.textContent = formatNumber(stage.ethReserve);
+                ethReserveCell.className = 'px-4 py-2 text-right';
+                row.appendChild(ethReserveCell);
+                
+                const usdcReserveCell = document.createElement('td');
+                usdcReserveCell.textContent = formatNumber(stage.usdcReserve);
+                usdcReserveCell.className = 'px-4 py-2 text-right';
+                row.appendChild(usdcReserveCell);
+                
+                const priceCell = document.createElement('td');
+                priceCell.textContent = formatNumber(stage.usdcReserve / stage.ethReserve);
+                priceCell.className = 'px-4 py-2 text-right';
+                row.appendChild(priceCell);
+                
+                const kCell = document.createElement('td');
+                kCell.textContent = formatNumber(stage.k);
+                kCell.className = 'px-4 py-2 text-right';
+                row.appendChild(kCell);
+                
+                tableBody.appendChild(row);
+            });
+            
+            log('Pool state table updated');
+        }
+
+        // Update attack status indicator
+        function updateAttackStatus(victimResult, profitResult) {
+            log('Updating attack status');
+            
+            const attackStatusElement = document.getElementById('attackStatus');
+            
+            if (!victimResult.transactionSucceeds) {
+                attackStatusElement.textContent = 'Transaction would fail due to high price impact!';
+                attackStatusElement.className = 'mt-4 p-3 text-center font-medium rounded bg-yellow-100 text-yellow-800';
+            } else if (profitResult.isProfitable) {
+                attackStatusElement.textContent = 'This transaction has a high risk of being sandwich attacked!';
+                attackStatusElement.className = 'mt-4 p-3 text-center font-medium rounded bg-red-100 text-red-800';
+            } else {
+                attackStatusElement.textContent = 'This transaction has a low risk of being sandwich attacked.';
+                attackStatusElement.className = 'mt-4 p-3 text-center font-medium rounded bg-green-100 text-green-800';
+            }
+            
+            log(`Attack status set to: ${attackStatusElement.textContent}`);
+        }
+
+        // Update profit explanation
+        function updateExplanation(victimResult, profitResult) {
+            log('Updating profit explanation');
+            
+            const explanationContainer = document.getElementById('attackExplanation');
+            
+            if (victimResult.transactionSucceeds) {
+                if (profitResult.isProfitable) {
+                    explanationContainer.innerHTML = `
+                        <div class="text-red-500 font-bold">This attack is profitable for the attacker.</div>
+                        <p>The attacker profits ${formatNumber(profitResult.netProfit)} ETH because:</p>
+                        <ul class="list-disc pl-5">
+                            <li>The front-run transaction increased the ETH reserves, causing price impact</li>
+                            <li>The victim's transaction succeeded but received ${formatNumber(victimResult.difference)} fewer USDC than expected</li>
+                            <li>The back-run transaction exploited the price movement to profit</li>
+                            <li>The total gas cost of ${formatNumber(profitResult.totalGasCost)} ETH was less than the profit gained</li>
+                        </ul>
+                        <p>This represents a ${formatNumber(profitResult.roi)}% return on investment.</p>
+                    `;
+                } else {
+                    explanationContainer.innerHTML = `
+                        <div class="text-green-500 font-bold">This attack is not profitable for the attacker.</div>
+                        <p>The attacker loses ${formatNumber(Math.abs(profitResult.netProfit))} ETH because:</p>
+                        <ul class="list-disc pl-5">
+                            <li>The price impact created by front-running (${formatNumber(victimResult.priceImpact)}%) was too small</li>
+                            <li>The back-run transaction did not return enough ETH to cover the initial cost</li>
+                            <li>The gas costs of ${formatNumber(profitResult.totalGasCost)} ETH eliminated any potential profit</li>
+                        </ul>
+                        <p>This represents a ${formatNumber(Math.abs(profitResult.roi))}% loss on investment.</p>
+                    `;
+                }
+            } else {
+                explanationContainer.innerHTML = `
+                    <div class="text-yellow-500 font-bold">The sandwich attack would fail.</div>
+                    <p>The attack would not succeed because:</p>
+                    <ul class="list-disc pl-5">
+                        <li>The victim's transaction would fail due to the price impact (${formatNumber(victimResult.priceImpact)}%) exceeding their slippage tolerance (${formatNumber(victimResult.slippageTolerance * 100)}%)</li>
+                        <li>Since the victim's transaction fails, the pool state doesn't change, making the back-run unprofitable</li>
+                        <li>The attacker would lose their gas costs of ${formatNumber(profitResult.frontRunGasCost)} ETH for the failed front-run</li>
+                    </ul>
+                `;
+            }
+            
+            explanationContainer.classList.remove('hidden');
+            log('Explanation updated');
+        }
+
+        // Update victim impact section
+        function updateVictimImpact(victimResult) {
+            log('Updating victim impact section');
+            
+            document.getElementById('expectedOutput').textContent = `${formatNumber(victimResult.expectedOutput)} USDC`;
+            document.getElementById('actualOutput').textContent = `${formatNumber(victimResult.actualOutput)} USDC`;
+            document.getElementById('priceImpact').textContent = `${formatNumber(victimResult.priceImpact)}%`;
+            document.getElementById('slippageDisplay').textContent = `${formatNumber(victimResult.slippageTolerance * 100)}%`;
+            
+            if (victimResult.transactionSucceeds) {
+                document.getElementById('transactionStatus').textContent = 'Successful';
+                document.getElementById('transactionStatus').className = 'font-medium text-green-600';
+            } else {
+                document.getElementById('transactionStatus').textContent = 'Failed (Impact > Tolerance)';
+                document.getElementById('transactionStatus').className = 'font-medium text-red-600';
+            }
+            
+            log('Victim impact section updated');
+        }
+
+        // Update attacker profit section
+        function updateAttackerProfit(frontRunResult, backRunResult, profitResult) {
+            log('Updating attacker profit section');
+            
+            document.getElementById('frontRunCost').textContent = `${formatNumber(frontRunResult.ethInput)} ETH`;
+            document.getElementById('backRunReturn').textContent = `${formatNumber(backRunResult.ethOutput)} ETH`;
+            document.getElementById('totalGasCost').textContent = `${formatNumber(profitResult.totalGasCost)} ETH`;
+            document.getElementById('netProfit').textContent = `${formatNumber(profitResult.netProfit)} ETH`;
+            document.getElementById('roi').textContent = `${formatNumber(profitResult.roi)}%`;
+            
+            if (profitResult.isProfitable) {
+                document.getElementById('isProfitable').textContent = 'Yes';
+                document.getElementById('isProfitable').className = 'font-medium text-green-600';
+            } else {
+                document.getElementById('isProfitable').textContent = 'No';
+                document.getElementById('isProfitable').className = 'font-medium text-red-600';
+            }
+            
+            log('Attacker profit section updated');
+        }
+
+        // Update transaction details
+        function updateTransactionDetails(frontRunResult, victimResult, backRunResult) {
+            log('Updating transaction details');
+            
+            // Front-run details
+            document.getElementById('frontRunEthInput').textContent = `${formatNumber(frontRunResult.ethInput)} ETH`;
+            document.getElementById('frontRunFee').textContent = `${formatNumber(frontRunResult.fee)} ETH`;
+            document.getElementById('frontRunEthAfterFee').textContent = `${formatNumber(frontRunResult.ethAfterFee)} ETH`;
+            document.getElementById('frontRunUsdcOutput').textContent = `${formatNumber(frontRunResult.usdcOutput)} USDC`;
+            document.getElementById('frontRunCalculation').textContent = `${formatNumber(frontRunResult.usdcOutput)} = ${formatNumber(frontRunResult.oldK / frontRunResult.newEthReserve)} (using constant product formula)`;
+            document.getElementById('frontRunNewPrice').textContent = `${formatNumber(frontRunResult.newUsdcReserve / frontRunResult.newEthReserve)} USDC/ETH`;
+            
+            // Victim details
+            document.getElementById('victimEthInput').textContent = `${formatNumber(victimResult.ethInput)} ETH`;
+            document.getElementById('victimFee').textContent = `${formatNumber(victimResult.fee)} ETH`;
+            document.getElementById('victimEthAfterFee').textContent = `${formatNumber(victimResult.ethAfterFee)} ETH`;
+            document.getElementById('victimExpectedOutput').textContent = `${formatNumber(victimResult.expectedOutput)} USDC`;
+            document.getElementById('victimActualOutput').textContent = `${formatNumber(victimResult.actualOutput)} USDC`;
+            document.getElementById('victimDifference').textContent = `${formatNumber(victimResult.difference)} USDC`;
+            document.getElementById('victimSlippageTolerance').textContent = `${formatNumber(victimResult.slippageTolerance * 100)}%`;
+            
+            if (victimResult.transactionSucceeds) {
+                document.getElementById('victimTransactionStatus').textContent = 'Successful';
+                document.getElementById('victimTransactionStatus').className = 'font-medium text-green-600';
+            } else {
+                document.getElementById('victimTransactionStatus').textContent = 'Failed (Impact > Tolerance)';
+                document.getElementById('victimTransactionStatus').className = 'font-medium text-red-600';
+            }
+            
+            // Back-run details
+            document.getElementById('backRunUsdcInput').textContent = `${formatNumber(backRunResult.usdcInput)} USDC`;
+            document.getElementById('backRunFee').textContent = `${formatNumber(backRunResult.fee)} USDC`;
+            document.getElementById('backRunUsdcAfterFee').textContent = `${formatNumber(backRunResult.usdcAfterFee)} USDC`;
+            document.getElementById('backRunEthOutput').textContent = `${formatNumber(backRunResult.ethOutput)} ETH`;
+            document.getElementById('backRunCalculation').textContent = `${formatNumber(backRunResult.ethOutput)} = ${formatNumber(backRunResult.oldK / backRunResult.newUsdcReserve)} (using constant product formula)`;
+            document.getElementById('backRunFinalPrice').textContent = `${formatNumber(backRunResult.newUsdcReserve / backRunResult.newEthReserve)} USDC/ETH`;
+            
+            log('Transaction details updated');
+        }
+
+        // Simulates the sandwich attack
+        function simulateAttack() {
+            log('Starting sandwich attack simulation');
+            
+            try {
+                // Clear any previous debug information
+                document.getElementById('debugLog').textContent = '';
+                
+                // Get parameters from UI
+                const params = getParameters();
+                log(`Parameters: ${JSON.stringify(params)}`);
+                
+                // Initialize pool state
+                const initialEthReserve = params.ethReserve;
+                const initialUsdcReserve = params.usdcReserve;
+                const initialK = initialEthReserve * initialUsdcReserve;
+                
+                log(`Initial pool state: ETH=${initialEthReserve}, USDC=${initialUsdcReserve}, k=${initialK}`);
+                
+                // Stage 1: Front-run
+                const frontRunResult = simulateFrontRun(
+                    initialEthReserve,
+                    initialUsdcReserve,
+                    params.frontRunAmount,
+                    params.poolFee
+                );
+                
+                // Stage 2: Victim trade
+                const victimResult = simulateVictimTrade(
+                    frontRunResult.newEthReserve,
+                    frontRunResult.newUsdcReserve,
+                    params.tradeAmount,
+                    params.poolFee,
+                    params.slippageTolerance,
+                    initialEthReserve,
+                    initialUsdcReserve
+                );
+                
+                // Stage 3: Back-run (if victim transaction succeeds)
+                let backRunResult;
+                if (victimResult.transactionSucceeds) {
+                    // Use the front-run USDC output for the back-run
+                    backRunResult = simulateBackRun(
+                        victimResult.newEthReserve,
+                        victimResult.newUsdcReserve,
+                        frontRunResult.usdcOutput,
+                        params.poolFee
+                    );
+                } else {
+                    // If victim transaction fails, the back-run would use the original pool state
+                    backRunResult = simulateBackRun(
+                        frontRunResult.newEthReserve,
+                        frontRunResult.newUsdcReserve,
+                        frontRunResult.usdcOutput,
+                        params.poolFee
+                    );
+                }
+                
+                // Calculate profit
+                const profitResult = calculateProfit(
+                    params.frontRunAmount,
+                    backRunResult.ethOutput,
+                    params.gasPrice
+                );
+                
+                // Prepare pool state data for visualization
+                const stages = [
+                    {
+                        name: 'Initial',
+                        ethReserve: initialEthReserve,
+                        usdcReserve: initialUsdcReserve,
+                        k: initialK
+                    },
+                    {
+                        name: 'After Front-run',
+                        ethReserve: frontRunResult.newEthReserve,
+                        usdcReserve: frontRunResult.newUsdcReserve,
+                        k: frontRunResult.newK
+                    },
+                    {
+                        name: 'After Victim',
+                        ethReserve: victimResult.newEthReserve,
+                        usdcReserve: victimResult.newUsdcReserve,
+                        k: victimResult.newK
+                    },
+                    {
+                        name: 'After Back-run',
+                        ethReserve: backRunResult.newEthReserve,
+                        usdcReserve: backRunResult.newUsdcReserve,
+                        k: backRunResult.newK
+                    }
+                ];
+                
+                log(`Final profit calculation: ${JSON.stringify(profitResult)}`);
+                log(`Stages for visualization: ${JSON.stringify(stages)}`);
+                
+                // Update UI with results
+                updatePoolStateTable(stages);
+                updatePriceImpactChart(stages);
+                updateLiquidityDepthChart(stages, victimResult);
+                updateAttackStatus(victimResult, profitResult);
+                updateVictimImpact(victimResult);
+                updateAttackerProfit(frontRunResult, backRunResult, profitResult);
+                updateTransactionDetails(frontRunResult, victimResult, backRunResult);
+                updateExplanation(victimResult, profitResult);
+                
+                log('Simulation completed successfully');
+                return true;
+            } catch (error) {
+                console.error('Error in simulation:', error);
+                log(`ERROR: ${error.message}\n${error.stack}`);
+                alert('An error occurred during simulation. Check the debug output for details.');
+                return false;
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            log('Application initializing');
+            
+            // Update all value displays
+            updateValueDisplays();
+            
+            // Initialize charts
+            initializeCharts();
+            
+            // Set up input event listeners
+            const inputs = document.querySelectorAll('input[type="range"]');
+            inputs.forEach(input => {
+                input.addEventListener('input', updateValueDisplays);
+            });
+            
+            // Set up simulate button
+            document.getElementById('simulateButton').addEventListener('click', function() {
+                log('Simulate button clicked');
+                simulateAttack();
+            });
+            
+            // Set up toggle explanations
+            document.getElementById('toggleExplanation').addEventListener('click', function() {
+                const explanationElement = document.getElementById('attackExplanation');
+                explanationElement.classList.toggle('hidden');
+            });
+            
+            // Set up toggle details
+            const toggleButtons = document.querySelectorAll('.toggle-details');
+            toggleButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const content = this.nextElementSibling;
+                    content.classList.toggle('hidden');
+                    const icon = this.querySelector('svg');
+                    icon.classList.toggle('transform');
+                    icon.classList.toggle('rotate-180');
+                });
+            });
+            
+            log('Application initialized successfully');
+            
+            // Run initial simulation
+            simulateAttack();
         });
-      });
-    });
-  </script>
+    </script>
 </body>
 </html>
