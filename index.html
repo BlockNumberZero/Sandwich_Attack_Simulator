@@ -26,10 +26,9 @@
             </div>
         </div>
     </div>
-   <!-- Rest of your existing code below --> 
+
+    <!-- Main Content -->
     <div class="container mx-auto px-4 py-8">
-       
-        
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Parameters Section -->
             <div class="bg-white p-6 rounded-lg shadow-md col-span-1">
@@ -448,7 +447,7 @@
             }
         }
 
-        // Format numbers with commas and specified decimals
+        // Corrected number formatting function
         function formatNumber(num, decimals = 4) {
             if (num === undefined || num === null || isNaN(num)) return '-';
             
@@ -467,8 +466,12 @@
                 formatted = num.toFixed(decimals);
             }
             
-            // Add commas for thousands separators
-            return formatted.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            // Split into integer and decimal parts
+            const parts = formatted.split('.');
+            // Add commas only to the integer part
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            // Recombine parts
+            return parts.join('.');
         }
 
         // Update input value displays
