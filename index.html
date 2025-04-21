@@ -7,180 +7,134 @@
     <title>Sandwich Attack Simulator</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css">
     <style>
         :root {
-            --bg-primary: #f3f4f6;
-            --bg-card: #ffffff;
-            --text-primary: #111827;
-            --text-secondary: #4b5563;
-            --accent-primary: #3b82f6;
-            --accent-hover: #2563eb;
+            --background-color: #f3f4f6;
+            --card-bg-color: #ffffff;
+            --text-color: #1f2937;
+            --secondary-text-color: #6b7280;
             --border-color: #e5e7eb;
+            --hover-color: #f9fafb;
             --slider-bg: #dbeafe;
-            --slider-thumb: #3b82f6;
-            --chart-grid: rgba(156, 163, 175, 0.2);
-            --success-bg: #d1fae5;
-            --success-text: #047857;
-            --warning-bg: #fef3c7;
-            --warning-text: #92400e;
-            --danger-bg: #fee2e2;
-            --danger-text: #b91c1c;
+            --primary-color: #2563eb;
+            --danger-color: #ef4444;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --table-header-bg: #f9fafb;
+            --accent-color: #3b82f6;
         }
-        
+
         .dark-mode {
-            --bg-primary: #111827;
-            --bg-card: #1f2937;
-            --text-primary: #f3f4f6;
-            --text-secondary: #d1d5db;
-            --accent-primary: #3b82f6;
-            --accent-hover: #60a5fa;
+            --background-color: #111827;
+            --card-bg-color: #1f2937;
+            --text-color: #f9fafb;
+            --secondary-text-color: #9ca3af;
             --border-color: #374151;
+            --hover-color: #374151;
             --slider-bg: #374151;
-            --slider-thumb: #60a5fa;
-            --chart-grid: rgba(75, 85, 99, 0.3);
-            --success-bg: #064e3b;
-            --success-text: #34d399;
-            --warning-bg: #78350f;
-            --warning-text: #fbbf24;
-            --danger-bg: #7f1d1d;
-            --danger-text: #f87171;
+            --primary-color: #3b82f6;
+            --danger-color: #f87171;
+            --success-color: #34d399;
+            --warning-color: #fbbf24;
+            --table-header-bg: #111827;
+            --accent-color: #60a5fa;
         }
-        
+
         body {
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
+            background-color: var(--background-color);
+            color: var(--text-color);
             transition: background-color 0.3s, color 0.3s;
         }
-        
-        .bg-card {
-            background-color: var(--bg-card);
+
+        .card {
+            background-color: var(--card-bg-color);
+            color: var(--text-color);
+            border-color: var(--border-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .secondary-text {
+            color: var(--secondary-text-color);
+        }
+
+        input[type=range] {
+            background-color: var(--slider-bg);
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            background-color: var(--primary-color);
+        }
+
+        table th {
+            background-color: var(--table-header-bg);
+            color: var(--secondary-text-color);
+        }
+
+        table td {
+            color: var(--text-color);
             border-color: var(--border-color);
         }
-        
-        .text-secondary {
-            color: var(--text-secondary);
-        }
-        
-        /* Custom Slider Styling */
-        input[type="range"] {
-            -webkit-appearance: none;
-            height: 8px;
-            background: var(--slider-bg);
-            border-radius: 5px;
-            outline: none;
-            transition: background 0.3s;
-        }
-        
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
-            background: var(--slider-thumb);
-            border-radius: 50%;
-            cursor: pointer;
-            transition: background 0.3s, transform 0.1s;
-        }
-        
-        input[type="range"]::-moz-range-thumb {
-            width: 18px;
-            height: 18px;
-            background: var(--slider-thumb);
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: background 0.3s, transform 0.1s;
-        }
-        
-        input[type="range"]:hover::-webkit-slider-thumb {
-            transform: scale(1.1);
-        }
-        
-        input[type="range"]:hover::-moz-range-thumb {
-            transform: scale(1.1);
-        }
-        
-        /* Theme Toggle Button */
+
         .theme-toggle {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            background-color: var(--bg-card);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
+            top: 1.5rem;
+            right: 1.5rem;
+            background-color: var(--card-bg-color);
+            color: var(--text-color);
+            padding: 0.5rem;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 2.5rem;
+            height: 2.5rem;
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             cursor: pointer;
-            transition: background-color 0.3s, color 0.3s, transform 0.2s;
-            z-index: 10;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, color 0.3s;
         }
-        
+
         .theme-toggle:hover {
-            transform: scale(1.1);
+            background-color: var(--hover-color);
         }
-        
-        /* Status Indicators */
-        .status-success {
-            background-color: var(--success-bg);
-            color: var(--success-text);
+
+        #attackExplanation {
+            background-color: var(--hover-color);
+            color: var(--text-color);
         }
-        
-        .status-warning {
-            background-color: var(--warning-bg);
-            color: var(--warning-text);
+
+        .dark-mode #attackExplanation {
+            background-color: #2d3748;
+            color: #f9fafb;
         }
-        
-        .status-danger {
-            background-color: var(--danger-bg);
-            color: var(--danger-text);
+
+        /* Ensuring text colors are correct in dark mode */
+        .dark-mode .text-red-500 {
+            color: #f87171;
         }
-        
-        /* Animate toggle icons */
-        .param-icon {
-            display: inline-block;
-            width: 20px;
-            margin-right: 6px;
-            text-align: center;
+
+        .dark-mode .text-green-500 {
+            color: #34d399;
         }
-        
-        /* Button styling */
-        .btn-primary {
-            background-color: var(--accent-primary);
-            color: white;
-            transition: background-color 0.3s;
+
+        .dark-mode .text-yellow-500 {
+            color: #fbbf24;
         }
-        
-        .btn-primary:hover {
-            background-color: var(--accent-hover);
+
+        .dark-mode .text-blue-600 {
+            color: #60a5fa;
         }
-        
-        /* Chart canvas background */
-        canvas {
-            background-color: var(--bg-card);
-            transition: background-color 0.3s;
-        }
-        
-        /* Table styling */
-        table thead th {
-            background-color: var(--bg-primary) !important;
-            color: var(--text-secondary) !important;
-        }
-        
-        table tbody td {
-            color: var(--text-primary);
-            border-color: var(--border-color);
+
+        .dark-mode .text-blue-800:hover {
+            color: #93c5fd;
         }
     </style>
 </head>
 <body class="min-h-screen">
-    <!-- Theme Toggle Button -->
-    <button id="themeToggle" class="theme-toggle" title="Toggle Dark/Light Mode">
+    <!-- Theme Toggle -->
+    <div class="theme-toggle" id="themeToggle">
         <i class="fas fa-sun"></i>
-    </button>
+    </div>
 
     <!-- Header Section -->
     <div class="container mx-auto px-4 py-4">
@@ -195,7 +149,7 @@
             <!-- Centered Title Group -->
             <div class="flex-grow text-center">
                 <h1 class="text-3xl font-bold mb-1">Sandwich Attack Simulator (v 0.1)</h1>
-                <h2 class="text-xl text-secondary">Understand how sandwich attacks work in DeFi trading</h2>
+                <h2 class="text-xl secondary-text">Understand how sandwich attacks work in DeFi trading</h2>
             </div>
         </div>
     </div>
@@ -204,20 +158,19 @@
     <div class="container mx-auto px-4 py-8">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Parameters Section -->
-            <div class="bg-card p-6 rounded-lg shadow-md col-span-1">
+            <div class="card p-6 rounded-lg shadow-md col-span-1">
                 <h3 class="text-xl font-semibold mb-4">Parameters</h3>
                 
                 <!-- Price Settings -->
                 <div class="mb-6">
-                    <h4 class="font-medium mb-2">
-                        <span class="param-icon"><i class="fas fa-coins text-yellow-500"></i></span>
-                        Price Settings
+                    <h4 class="font-medium secondary-text mb-2">
+                        <i class="fas fa-coins mr-2"></i>Price Settings
                     </h4>
                     <div class="mb-3">
                         <label class="block text-sm mb-1">ETH / USDC ratio</label>
                         <input type="range" id="ethPrice" min="1000" max="20000" step="100" value="2000" 
-                               class="w-full cursor-pointer">
-                        <div class="flex justify-between text-xs text-secondary mt-1">
+                               class="w-full h-2 rounded-lg appearance-none cursor-pointer">
+                        <div class="flex justify-between text-xs secondary-text">
                             <span>1,000</span>
                             <span id="ethPriceValue">2,000</span>
                             <span>20,000</span>
@@ -227,15 +180,14 @@
                 
                 <!-- Gas Cost -->
                 <div class="mb-6">
-                    <h4 class="font-medium mb-2">
-                        <span class="param-icon"><i class="fas fa-gas-pump text-red-500"></i></span>
-                        Gas Cost
+                    <h4 class="font-medium secondary-text mb-2">
+                        <i class="fas fa-gas-pump mr-2"></i>Gas Cost
                     </h4>
                     <div class="mb-3">
                         <label class="block text-sm mb-1">Gas price (Gwei)</label>
                         <input type="range" id="gasPrice" min="1" max="500" step="1" value="20" 
-                               class="w-full cursor-pointer">
-                        <div class="flex justify-between text-xs text-secondary mt-1">
+                               class="w-full h-2 rounded-lg appearance-none cursor-pointer">
+                        <div class="flex justify-between text-xs secondary-text">
                             <span>1</span>
                             <span id="gasPriceValue">20</span>
                             <span>500</span>
@@ -249,15 +201,14 @@
                 
                 <!-- Liquidity Pool -->
                 <div class="mb-6">
-                    <h4 class="font-medium mb-2">
-                        <span class="param-icon"><i class="fas fa-water text-blue-500"></i></span>
-                        Liquidity Pool
+                    <h4 class="font-medium secondary-text mb-2">
+                        <i class="fas fa-water mr-2"></i>Liquidity Pool
                     </h4>
                     <div class="mb-3">
                         <label class="block text-sm mb-1">Initial ETH Reserve</label>
                         <input type="range" id="ethReserve" min="1000" max="100000" step="10" value="10000" 
-                               class="w-full cursor-pointer">
-                        <div class="flex justify-between text-xs text-secondary mt-1">
+                               class="w-full h-2 rounded-lg appearance-none cursor-pointer">
+                        <div class="flex justify-between text-xs secondary-text">
                             <span>1k</span>
                             <span id="ethReserveValue">10,000</span>
                             <span>100K</span>
@@ -266,8 +217,8 @@
                     <div class="mb-3">
                         <label class="block text-sm mb-1">Initial USDC Reserve</label>
                         <input type="range" id="usdcReserve" min="1000000" max="100000000" step="10000" value="10000000" 
-                               class="w-full cursor-pointer">
-                        <div class="flex justify-between text-xs text-secondary mt-1">
+                               class="w-full h-2 rounded-lg appearance-none cursor-pointer">
+                        <div class="flex justify-between text-xs secondary-text">
                             <span>1M</span>
                             <span id="usdcReserveValue">1,000,000</span>
                             <span>100M</span>
@@ -276,8 +227,8 @@
                     <div class="mb-3">
                         <label class="block text-sm mb-1">Pool Fee (%)</label>
                         <input type="range" id="poolFee" min="0.1" max="1" step="0.1" value="0.3" 
-                               class="w-full cursor-pointer">
-                        <div class="flex justify-between text-xs text-secondary mt-1">
+                               class="w-full h-2 rounded-lg appearance-none cursor-pointer">
+                        <div class="flex justify-between text-xs secondary-text">
                             <span>0.1%</span>
                             <span id="poolFeeValue">0.3%</span>
                             <span>1%</span>
@@ -287,15 +238,14 @@
                 
                 <!-- Victim's Trade -->
                 <div class="mb-6">
-                    <h4 class="font-medium mb-2">
-                        <span class="param-icon"><i class="fas fa-user text-purple-500"></i></span>
-                        Victim's Trade
+                    <h4 class="font-medium secondary-text mb-2">
+                        <i class="fas fa-user mr-2"></i>Victim's Trade
                     </h4>
                     <div class="mb-3">
                         <label class="block text-sm mb-1">Trade Amount (ETH)</label>
                         <input type="range" id="tradeAmount" min="0.01" max="100" step="0.01" value="1" 
-                               class="w-full cursor-pointer">
-                        <div class="flex justify-between text-xs text-secondary mt-1">
+                               class="w-full h-2 rounded-lg appearance-none cursor-pointer">
+                        <div class="flex justify-between text-xs secondary-text">
                             <span>0.01</span>
                             <span id="tradeAmountValue">1</span>
                             <span>100</span>
@@ -304,8 +254,8 @@
                     <div class="mb-3">
                         <label class="block text-sm mb-1">Slippage Tolerance (%)</label>
                         <input type="range" id="slippageTolerance" min="0.1" max="10" step="0.1" value="0.5" 
-                               class="w-full cursor-pointer">
-                        <div class="flex justify-between text-xs text-secondary mt-1">
+                               class="w-full h-2 rounded-lg appearance-none cursor-pointer">
+                        <div class="flex justify-between text-xs secondary-text">
                             <span>0.1%</span>
                             <span id="slippageToleranceValue">0.5%</span>
                             <span>10%</span>
@@ -315,15 +265,14 @@
                 
                 <!-- Attack Parameters -->
                 <div class="mb-6">
-                    <h4 class="font-medium mb-2">
-                        <span class="param-icon"><i class="fas fa-bomb text-orange-500"></i></span>
-                        Attack Parameters
+                    <h4 class="font-medium secondary-text mb-2">
+                        <i class="fas fa-bolt mr-2"></i>Attack Parameters
                     </h4>
                     <div class="mb-3">
                         <label class="block text-sm mb-1">Front-run amount (ETH)</label>
                         <input type="range" id="frontRunAmount" min="0.001" max="100" step="0.001" value="0.5" 
-                               class="w-full cursor-pointer">
-                        <div class="flex justify-between text-xs text-secondary mt-1">
+                               class="w-full h-2 rounded-lg appearance-none cursor-pointer">
+                        <div class="flex justify-between text-xs secondary-text">
                             <span>0.001</span>
                             <span id="frontRunAmountValue">0.5</span>
                             <span>100</span>
@@ -331,11 +280,11 @@
                     </div>
                 </div>
                 
-                <button id="simulateButton" class="w-full btn-primary font-medium py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <i class="fas fa-play mr-2"></i> Simulate Attack
+                <button id="simulateButton" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    Simulate Attack
                 </button>
                 
-                <div id="debugOutput" class="mt-4 p-3 bg-card text-xs text-secondary rounded overflow-auto max-h-40 hidden">
+                <div id="debugOutput" class="mt-4 p-3 bg-gray-100 text-xs text-gray-700 rounded overflow-auto max-h-40 hidden">
                     <h4 class="font-bold mb-1">Debug Output:</h4>
                     <pre id="debugLog"></pre>
                 </div>
@@ -344,11 +293,8 @@
             <!-- Results Section -->
             <div class="col-span-1 md:col-span-2">
                 <!-- Price Impact Visualization -->
-                <div class="bg-card p-6 rounded-lg shadow-md mb-6">
-                    <h3 class="text-xl font-semibold mb-4">
-                        <i class="fas fa-chart-line mr-2 text-blue-500"></i>
-                        Price Impact Visualization
-                    </h3>
+                <div class="card p-6 rounded-lg shadow-md mb-6">
+                    <h3 class="text-xl font-semibold mb-4">Price Impact Visualization</h3>
                     <div class="h-64">
                         <canvas id="priceImpactChart"></canvas>
                     </div>
@@ -356,32 +302,26 @@
                 </div>
                 
                 <!-- Liquidity Depth Chart -->
-                <div class="bg-card p-6 rounded-lg shadow-md mb-6">
-                    <h3 class="text-xl font-semibold mb-4">
-                        <i class="fas fa-chart-bar mr-2 text-green-500"></i>
-                        Liquidity Depth Chart
-                    </h3>
+                <div class="card p-6 rounded-lg shadow-md mb-6">
+                    <h3 class="text-xl font-semibold mb-4">Liquidity Depth Chart</h3>
                     <div class="h-48">
                         <canvas id="liquidityDepthChart"></canvas>
                     </div>
-                    <p class="mt-2 text-sm text-secondary">This chart shows how liquidity is distributed around the current price. The sandwich attack targets the slippage in this zone.</p>
+                    <p class="mt-2 text-sm secondary-text">This chart shows how liquidity is distributed around the current price. The sandwich attack targets the slippage in this zone.</p>
                 </div>
                 
                 <!-- Pool State Updates -->
-                <div class="bg-card p-6 rounded-lg shadow-md mb-6">
-                    <h3 class="text-xl font-semibold mb-4">
-                        <i class="fas fa-exchange-alt mr-2 text-purple-500"></i>
-                        Pool State Updates
-                    </h3>
+                <div class="card p-6 rounded-lg shadow-md mb-6">
+                    <h3 class="text-xl font-semibold mb-4">Pool State Updates</h3>
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead>
                                 <tr>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-secondary uppercase tracking-wider">Stage</th>
-                                    <th class="px-4 py-2 text-right text-xs font-medium text-secondary uppercase tracking-wider">ETH Reserve</th>
-                                    <th class="px-4 py-2 text-right text-xs font-medium text-secondary uppercase tracking-wider">USDC Reserve</th>
-                                    <th class="px-4 py-2 text-right text-xs font-medium text-secondary uppercase tracking-wider">Price (USDC/ETH)</th>
-                                    <th class="px-4 py-2 text-right text-xs font-medium text-secondary uppercase tracking-wider">Constant K</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider">Stage</th>
+                                    <th class="px-4 py-2 text-right text-xs font-medium uppercase tracking-wider">ETH Reserve</th>
+                                    <th class="px-4 py-2 text-right text-xs font-medium uppercase tracking-wider">USDC Reserve</th>
+                                    <th class="px-4 py-2 text-right text-xs font-medium uppercase tracking-wider">Price (USDC/ETH)</th>
+                                    <th class="px-4 py-2 text-right text-xs font-medium uppercase tracking-wider">Constant K</th>
                                 </tr>
                             </thead>
                             <tbody id="poolStateTableBody" class="divide-y divide-gray-200">
@@ -392,37 +332,31 @@
                 </div>
                 
                 <!-- Attack Summary -->
-                <div class="bg-card p-6 rounded-lg shadow-md mb-6">
-                    <h3 class="text-xl font-semibold mb-4">
-                        <i class="fas fa-file-alt mr-2 text-yellow-500"></i>
-                        Attack Summary
-                    </h3>
+                <div class="card p-6 rounded-lg shadow-md mb-6">
+                    <h3 class="text-xl font-semibold mb-4">Attack Summary</h3>
                     
                     <!-- Victim Impact -->
                     <div class="mb-6">
-                        <h4 class="font-medium mb-2">
-                            <i class="fas fa-user-injured mr-2 text-red-500"></i>
-                            Victim Impact
-                        </h4>
+                        <h4 class="font-medium secondary-text mb-2">Victim Impact</h4>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <p class="text-sm text-secondary">Expected Output:</p>
+                                <p class="text-sm secondary-text">Expected Output:</p>
                                 <p id="expectedOutput" class="font-medium">-</p>
                             </div>
                             <div>
-                                <p class="text-sm text-secondary">Actual Output:</p>
+                                <p class="text-sm secondary-text">Actual Output:</p>
                                 <p id="actualOutput" class="font-medium">-</p>
                             </div>
                             <div>
-                                <p class="text-sm text-secondary">Price Impact:</p>
+                                <p class="text-sm secondary-text">Price Impact:</p>
                                 <p id="priceImpact" class="font-medium">-</p>
                             </div>
                             <div>
-                                <p class="text-sm text-secondary">Slippage Tolerance:</p>
+                                <p class="text-sm secondary-text">Slippage Tolerance:</p>
                                 <p id="slippageDisplay" class="font-medium">-</p>
                             </div>
                             <div>
-                                <p class="text-sm text-secondary">Transaction Status:</p>
+                                <p class="text-sm secondary-text">Transaction Status:</p>
                                 <p id="transactionStatus" class="font-medium">-</p>
                             </div>
                         </div>
@@ -430,33 +364,30 @@
                     
                     <!-- Attacker's Profit -->
                     <div>
-                        <h4 class="font-medium mb-2">
-                            <i class="fas fa-money-bill-wave mr-2 text-green-500"></i>
-                            Attacker's Profit
-                        </h4>
+                        <h4 class="font-medium secondary-text mb-2">Attacker's Profit</h4>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <p class="text-sm text-secondary">Front-run Cost:</p>
+                                <p class="text-sm secondary-text">Front-run Cost:</p>
                                 <p id="frontRunCost" class="font-medium">-</p>
                             </div>
                             <div>
-                                <p class="text-sm text-secondary">Back-run Return:</p>
+                                <p class="text-sm secondary-text">Back-run Return:</p>
                                 <p id="backRunReturn" class="font-medium">-</p>
                             </div>
                             <div>
-                                <p class="text-sm text-secondary">Gas Cost (Total):</p>
+                                <p class="text-sm secondary-text">Gas Cost (Total):</p>
                                 <p id="totalGasCost" class="font-medium">-</p>
                             </div>
                             <div>
-                                <p class="text-sm text-secondary">Net Profit:</p>
+                                <p class="text-sm secondary-text">Net Profit:</p>
                                 <p id="netProfit" class="font-medium">-</p>
                             </div>
                             <div>
-                                <p class="text-sm text-secondary">ROI:</p>
+                                <p class="text-sm secondary-text">ROI:</p>
                                 <p id="roi" class="font-medium">-</p>
                             </div>
                             <div>
-                                <p class="text-sm text-secondary">Profitable After Gas:</p>
+                                <p class="text-sm secondary-text">Profitable After Gas:</p>
                                 <p id="isProfitable" class="font-medium">-</p>
                             </div>
                         </div>
@@ -464,9 +395,11 @@
                         <div class="mt-4">
                             <button id="toggleExplanation" class="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center">
                                 <span>Why is this attack profitable or not?</span>
-                                <i class="fas fa-chevron-down ml-1"></i>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
                             </button>
-                            <div id="attackExplanation" class="mt-2 p-3 bg-gray-50 dark:bg-gray-800 rounded text-sm hidden">
+                            <div id="attackExplanation" class="mt-2 p-3 rounded text-sm hidden">
                                 Explanation will appear here after simulation.
                             </div>
                         </div>
@@ -474,42 +407,41 @@
                 </div>
                 
                 <!-- Detailed Transaction Breakdown -->
-                <div class="bg-card p-6 rounded-lg shadow-md mb-6">
-                    <h3 class="text-xl font-semibold mb-4">
-                        <i class="fas fa-code-branch mr-2 text-indigo-500"></i>
-                        Detailed Transaction Breakdown
-                    </h3>
+                <div class="card p-6 rounded-lg shadow-md mb-6">
+                    <h3 class="text-xl font-semibold mb-4">Detailed Transaction Breakdown</h3>
                     
                     <!-- Front-run Transaction -->
                     <div class="mb-4">
-                        <button class="toggle-details flex justify-between items-center w-full text-left font-medium py-2 border-b border-gray-200 dark:border-gray-700">
-                            <span><i class="fas fa-fast-forward mr-2 text-blue-500"></i> Front-run Transaction</span>
-                            <i class="fas fa-chevron-down"></i>
+                        <button class="toggle-details flex justify-between items-center w-full text-left font-medium py-2 border-b">
+                            <span>Front-run Transaction</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
                         </button>
                         <div class="details-content hidden mt-2">
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <p class="text-sm text-secondary">ETH Input:</p>
+                                    <p class="text-sm secondary-text">ETH Input:</p>
                                     <p id="frontRunEthInput" class="font-medium">-</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-secondary">Fee:</p>
+                                    <p class="text-sm secondary-text">Fee:</p>
                                     <p id="frontRunFee" class="font-medium">-</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-secondary">ETH After Fee:</p>
+                                    <p class="text-sm secondary-text">ETH After Fee:</p>
                                     <p id="frontRunEthAfterFee" class="font-medium">-</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-secondary">USDC Output:</p>
+                                    <p class="text-sm secondary-text">USDC Output:</p>
                                     <p id="frontRunUsdcOutput" class="font-medium">-</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-secondary">Calculation:</p>
+                                    <p class="text-sm secondary-text">Calculation:</p>
                                     <p id="frontRunCalculation" class="font-medium">-</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-secondary">New Pool Price:</p>
+                                    <p class="text-sm secondary-text">New Pool Price:</p>
                                     <p id="frontRunNewPrice" class="font-medium">-</p>
                                 </div>
                             </div>
@@ -518,42 +450,44 @@
                     
                     <!-- Victim's Transaction -->
                     <div class="mb-4">
-                        <button class="toggle-details flex justify-between items-center w-full text-left font-medium py-2 border-b border-gray-200 dark:border-gray-700">
-                            <span><i class="fas fa-user-shield mr-2 text-red-500"></i> Victim's Transaction</span>
-                            <i class="fas fa-chevron-down"></i>
+                        <button class="toggle-details flex justify-between items-center w-full text-left font-medium py-2 border-b">
+                            <span>Victim's Transaction</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
                         </button>
                         <div class="details-content hidden mt-2">
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <p class="text-sm text-secondary">ETH Input:</p>
+                                    <p class="text-sm secondary-text">ETH Input:</p>
                                     <p id="victimEthInput" class="font-medium">-</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-secondary">Fee:</p>
+                                    <p class="text-sm secondary-text">Fee:</p>
                                     <p id="victimFee" class="font-medium">-</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-secondary">ETH After Fee:</p>
+                                    <p class="text-sm secondary-text">ETH After Fee:</p>
                                     <p id="victimEthAfterFee" class="font-medium">-</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-secondary">Expected Output (Initial Pool):</p>
+                                    <p class="text-sm secondary-text">Expected Output (Initial Pool):</p>
                                     <p id="victimExpectedOutput" class="font-medium">-</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-secondary">Actual Output (After Front-run):</p>
+                                    <p class="text-sm secondary-text">Actual Output (After Front-run):</p>
                                     <p id="victimActualOutput" class="font-medium">-</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-secondary">Difference:</p>
+                                    <p class="text-sm secondary-text">Difference:</p>
                                     <p id="victimDifference" class="font-medium">-</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-secondary">Slippage Tolerance:</p>
+                                    <p class="text-sm secondary-text">Slippage Tolerance:</p>
                                     <p id="victimSlippageTolerance" class="font-medium">-</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-secondary">Transaction Status:</p>
+                                    <p class="text-sm secondary-text">Transaction Status:</p>
                                     <p id="victimTransactionStatus" class="font-medium">-</p>
                                 </div>
                             </div>
@@ -562,34 +496,36 @@
                     
                     <!-- Back-run Transaction -->
                     <div class="mb-4">
-                        <button class="toggle-details flex justify-between items-center w-full text-left font-medium py-2 border-b border-gray-200 dark:border-gray-700">
-                            <span><i class="fas fa-fast-backward mr-2 text-green-500"></i> Back-run Transaction</span>
-                            <i class="fas fa-chevron-down"></i>
+                        <button class="toggle-details flex justify-between items-center w-full text-left font-medium py-2 border-b">
+                            <span>Back-run Transaction</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
                         </button>
                         <div class="details-content hidden mt-2">
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <p class="text-sm text-secondary">USDC Input:</p>
+                                    <p class="text-sm secondary-text">USDC Input:</p>
                                     <p id="backRunUsdcInput" class="font-medium">-</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-secondary">Fee:</p>
+                                    <p class="text-sm secondary-text">Fee:</p>
                                     <p id="backRunFee" class="font-medium">-</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-secondary">USDC After Fee:</p>
+                                    <p class="text-sm secondary-text">USDC After Fee:</p>
                                     <p id="backRunUsdcAfterFee" class="font-medium">-</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-secondary">ETH Output:</p>
+                                    <p class="text-sm secondary-text">ETH Output:</p>
                                     <p id="backRunEthOutput" class="font-medium">-</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-secondary">Calculation:</p>
+                                    <p class="text-sm secondary-text">Calculation:</p>
                                     <p id="backRunCalculation" class="font-medium">-</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-secondary">Final Pool Price:</p>
+                                    <p class="text-sm secondary-text">Final Pool Price:</p>
                                     <p id="backRunFinalPrice" class="font-medium">-</p>
                                 </div>
                             </div>
@@ -598,9 +534,11 @@
                     
                     <!-- Mathematical Breakdown -->
                     <div>
-                        <button class="toggle-details flex justify-between items-center w-full text-left font-medium py-2 border-b border-gray-200 dark:border-gray-700">
-                            <span><i class="fas fa-calculator mr-2 text-yellow-500"></i> Mathematical Breakdown</span>
-                            <i class="fas fa-chevron-down"></i>
+                        <button class="toggle-details flex justify-between items-center w-full text-left font-medium py-2 border-b">
+                            <span>Mathematical Breakdown</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
                         </button>
                         <div class="details-content hidden mt-2">
                             <div class="mb-3">
@@ -627,54 +565,68 @@
     </div>
 
     <script>
-        // Theme management
+        // Theme toggle functionality
         const themeToggle = document.getElementById('themeToggle');
-        const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)');
-        let isDarkMode = localStorage.getItem('darkMode') === 'true' || prefersDarkMode.matches;
+        const body = document.body;
+        const icon = themeToggle.querySelector('i');
         
-        // Set initial theme
-        if (isDarkMode) {
-            document.body.classList.add('dark-mode');
-            themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-        } else {
-            themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        // Check for saved theme preference or use preferred color scheme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            body.classList.add('dark-mode');
+            icon.classList.remove('fa-sun');
+            icon.classList.add('fa-moon');
         }
         
-        // Toggle theme on button click
-        themeToggle.addEventListener('click', () => {
-            isDarkMode = !isDarkMode;
-            document.body.classList.toggle('dark-mode', isDarkMode);
-            localStorage.setItem('darkMode', isDarkMode);
+        // Toggle theme
+        themeToggle.addEventListener('click', function() {
+            body.classList.toggle('dark-mode');
             
-            if (isDarkMode) {
-                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            if (body.classList.contains('dark-mode')) {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'dark');
+                
+                // Update chart themes if they exist
+                if (priceImpactChart) {
+                    priceImpactChart.options.plugins.legend.labels.color = '#f9fafb';
+                    priceImpactChart.options.scales.x.ticks.color = '#9ca3af';
+                    priceImpactChart.options.scales.y.ticks.color = '#9ca3af';
+                    priceImpactChart.options.scales.y.title.color = '#9ca3af';
+                    priceImpactChart.update();
+                }
+                
+                if (liquidityDepthChart) {
+                    liquidityDepthChart.options.plugins.legend.labels.color = '#f9fafb';
+                    liquidityDepthChart.options.scales.x.ticks.color = '#9ca3af';
+                    liquidityDepthChart.options.scales.y.ticks.color = '#9ca3af';
+                    liquidityDepthChart.options.scales.y.title.color = '#9ca3af';
+                    liquidityDepthChart.update();
+                }
             } else {
-                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-            }
-            
-            // Update charts if they exist
-            if (priceImpactChart) {
-                updateChartStyles(priceImpactChart);
-                priceImpactChart.update();
-            }
-            if (liquidityDepthChart) {
-                updateChartStyles(liquidityDepthChart);
-                liquidityDepthChart.update();
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'light');
+                
+                // Update chart themes if they exist
+                if (priceImpactChart) {
+                    priceImpactChart.options.plugins.legend.labels.color = '#1f2937';
+                    priceImpactChart.options.scales.x.ticks.color = '#6b7280';
+                    priceImpactChart.options.scales.y.ticks.color = '#6b7280';
+                    priceImpactChart.options.scales.y.title.color = '#6b7280';
+                    priceImpactChart.update();
+                }
+                
+                if (liquidityDepthChart) {
+                    liquidityDepthChart.options.plugins.legend.labels.color = '#1f2937';
+                    liquidityDepthChart.options.scales.x.ticks.color = '#6b7280';
+                    liquidityDepthChart.options.scales.y.ticks.color = '#6b7280';
+                    liquidityDepthChart.options.scales.y.title.color = '#6b7280';
+                    liquidityDepthChart.update();
+                }
             }
         });
-        
-        // Function to update chart styles based on current theme
-        function updateChartStyles(chart) {
-            const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-grid');
-            const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary');
-            
-            chart.options.scales.x.grid.color = gridColor;
-            chart.options.scales.y.grid.color = gridColor;
-            chart.options.scales.x.ticks.color = textColor;
-            chart.options.scales.y.ticks.color = textColor;
-            chart.options.plugins.legend.labels.color = textColor;
-        }
-        
+
         // Enable debug mode - set to true to show debug output
         const DEBUG = true;
         
@@ -949,56 +901,10 @@
         let liquidityDepthChart = null;
 
         function initializeCharts() {
-            const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary');
-            const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-grid');
-            
-            // Common chart options
-            const chartOptions = {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: textColor,
-                            font: {
-                                family: "'Helvetica', 'Arial', sans-serif",
-                                size: 12
-                            }
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                        titleFont: {
-                            size: 14,
-                            weight: 'bold'
-                        },
-                        bodyFont: {
-                            size: 13
-                        },
-                        padding: 10,
-                        cornerRadius: 4,
-                        displayColors: true
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: {
-                            color: gridColor
-                        },
-                        ticks: {
-                            color: textColor
-                        }
-                    },
-                    y: {
-                        grid: {
-                            color: gridColor
-                        },
-                        ticks: {
-                            color: textColor
-                        }
-                    }
-                }
-            };
+            // Set text colors based on theme
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            const textColor = isDarkMode ? '#9ca3af' : '#6b7280';
+            const labelColor = isDarkMode ? '#f9fafb' : '#1f2937';
             
             // Price Impact Chart
             const priceImpactCtx = document.getElementById('priceImpactChart').getContext('2d');
@@ -1011,35 +917,41 @@
                             label: 'Natural Price',
                             data: [0, 0, 0, 0],
                             borderColor: 'rgba(75, 192, 192, 1)',
-                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                            tension: 0.2,
-                            fill: false,
-                            borderWidth: 3,
-                            pointRadius: 4,
-                            pointHoverRadius: 6
+                            tension: 0.1,
+                            fill: false
                         },
                         {
                             label: 'Sandwich Attack Price',
                             data: [0, 0, 0, 0],
                             borderColor: 'rgba(255, 99, 132, 1)',
-                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                            tension: 0.2,
-                            fill: false,
-                            borderWidth: 3,
-                            pointRadius: 4,
-                            pointHoverRadius: 6
+                            tension: 0.1,
+                            fill: false
                         }
                     ]
                 },
                 options: {
-                    ...chartOptions,
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: labelColor
+                            }
+                        }
+                    },
                     scales: {
-                        ...chartOptions.scales,
+                        x: {
+                            ticks: {
+                                color: textColor
+                            }
+                        },
                         y: {
-                            ...chartOptions.scales.y,
                             title: {
                                 display: true,
                                 text: 'Price (USDC/ETH)',
+                                color: textColor
+                            },
+                            ticks: {
                                 color: textColor
                             }
                         }
@@ -1057,9 +969,9 @@
                         label: 'Liquidity',
                         data: [0, 0, 0],
                         backgroundColor: [
-                            'rgba(75, 192, 192, 0.7)',
-                            'rgba(255, 206, 86, 0.7)',
-                            'rgba(255, 99, 132, 0.7)'
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(255, 99, 132, 0.6)'
                         ],
                         borderColor: [
                             'rgba(75, 192, 192, 1)',
@@ -1070,15 +982,29 @@
                     }]
                 },
                 options: {
-                    ...chartOptions,
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: labelColor
+                            }
+                        }
+                    },
                     scales: {
-                        ...chartOptions.scales,
+                        x: {
+                            ticks: {
+                                color: textColor
+                            }
+                        },
                         y: {
-                            ...chartOptions.scales.y,
                             beginAtZero: true,
                             title: {
                                 display: true,
                                 text: 'Liquidity Depth',
+                                color: textColor
+                            },
+                            ticks: {
                                 color: textColor
                             }
                         }
@@ -1199,13 +1125,13 @@
             
             if (!victimResult.transactionSucceeds) {
                 attackStatusElement.textContent = 'Transaction would fail due to high price impact!';
-                attackStatusElement.className = 'mt-4 p-3 text-center font-medium rounded status-warning';
+                attackStatusElement.className = 'mt-4 p-3 text-center font-medium rounded bg-yellow-100 text-yellow-800';
             } else if (profitResult.isProfitable) {
                 attackStatusElement.textContent = 'This transaction has a high risk of being sandwich attacked!';
-                attackStatusElement.className = 'mt-4 p-3 text-center font-medium rounded status-danger';
+                attackStatusElement.className = 'mt-4 p-3 text-center font-medium rounded bg-red-100 text-red-800';
             } else {
                 attackStatusElement.textContent = 'This transaction has a low risk of being sandwich attacked.';
-                attackStatusElement.className = 'mt-4 p-3 text-center font-medium rounded status-success';
+                attackStatusElement.className = 'mt-4 p-3 text-center font-medium rounded bg-green-100 text-green-800';
             }
             
             log(`Attack status set to: ${attackStatusElement.textContent}`);
@@ -1481,11 +1407,6 @@
             document.getElementById('toggleExplanation').addEventListener('click', function() {
                 const explanationElement = document.getElementById('attackExplanation');
                 explanationElement.classList.toggle('hidden');
-                
-                // Toggle icon
-                const icon = this.querySelector('i');
-                icon.classList.toggle('fa-chevron-down');
-                icon.classList.toggle('fa-chevron-up');
             });
             
             // Set up toggle details
@@ -1494,11 +1415,9 @@
                 button.addEventListener('click', function() {
                     const content = this.nextElementSibling;
                     content.classList.toggle('hidden');
-                    
-                    // Toggle icon
-                    const icon = this.querySelector('i.fas');
-                    icon.classList.toggle('fa-chevron-down');
-                    icon.classList.toggle('fa-chevron-up');
+                    const icon = this.querySelector('svg');
+                    icon.classList.toggle('transform');
+                    icon.classList.toggle('rotate-180');
                 });
             });
             
