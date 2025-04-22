@@ -131,6 +131,16 @@
     </style>
 </head>
 <body class="min-h-screen">
+
+    <!-- ADD THIS LOADING SCREEN auth0 -->
+    <div id="loading" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; justify-content: center; align-items: center;">
+        <h2>Loading... Please wait</h2>
+    </div>
+    <!-- CLOSED LOADING SCREEN auth0 -->
+    <!-- App Content Open auth0 -->
+    <div id="appContent" style="display: none;">
+    <!-- App Content Close auth0 --> 
+        
     <!-- Theme Toggle -->
     <div class="theme-toggle" id="themeToggle">
         <i class="fas fa-sun"></i>
@@ -564,6 +574,31 @@
         </div>
     </div>
 
+        <!-- Auth0 Integration Start -->
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa.js"></script>
+    <script>
+      // Configure Auth0
+      const auth0Client = createAuth0Client({
+        domain: "blocknumberzero.eu.auth0.com",
+        client_id: "njg6q6G9YykTkMWqaBmtqgyV1RJPr5TP",
+        redirect_uri: window.location.origin
+      });
+
+      // Check login status
+      (async function() {
+        const client = await auth0Client;
+        const isAuthenticated = await client.isAuthenticated();
+        
+        if (!isAuthenticated) {
+          await client.loginWithRedirect();
+        }
+        
+        // Show app content after login
+        document.getElementById('appContent').style.display = 'block';
+        document.getElementById('loading').style.display = 'none';
+      })();
+    </script>
+        <!-- Auth0 Integration End --> 
     <script>
         // Theme toggle functionality
         const themeToggle = document.getElementById('themeToggle');
