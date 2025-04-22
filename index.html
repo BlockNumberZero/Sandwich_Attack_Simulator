@@ -8,6 +8,11 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css">
+
+    <!-- Auth0 Script -->
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
+    <!-- Auth0 Script -->
+    
     <style>
         :root {
             --background-color: #f3f4f6;
@@ -93,7 +98,16 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             transition: background-color 0.3s, color 0.3s;
         }
-
+        /* Auth0 */
+        #authButton {
+            right: 5rem;
+            transition: background-color 0.3s;
+        }
+        
+        #authButton:hover {
+            background-color: var(--hover-color);
+        }
+        /* Auth0 */
         .theme-toggle:hover {
             background-color: var(--hover-color);
         }
@@ -135,7 +149,12 @@
     <div class="theme-toggle" id="themeToggle">
         <i class="fas fa-sun"></i>
     </div>
-
+    <!-- Auth0 Login Button -->
+<div class="theme-toggle" id="authButton" style="right: 5rem;">
+    <i class="fas fa-user"></i>
+</div>
+    <!-- Auth0 Login Button -->
+    
     <!-- Header Section -->
     <div class="container mx-auto px-4 py-4">
         <div class="flex items-center">
@@ -565,6 +584,46 @@
     </div>
  
     <script>
+    
+    // ===== AUTH0 CONFIG START =====
+    const auth0Config = {
+        domain: 'blocknumberzero.eu.auth0.com',
+        client_id: 'njg6qGC6YykTkMWqabmtqqvV1RJPr5IP',
+        redirect_uri: window.location.origin,
+        cacheLocation: 'localstorage'
+    };
+    
+    const auth0 = new Auth0Client(auth0Config);
+    
+    async function login() {
+        await auth0.loginWithPopup();
+        updateAuthUI();
+    }
+    
+    async function logout() {
+        await auth0.logout({ returnTo: window.location.origin });
+    }
+    
+    async function updateAuthUI() {
+        const isLoggedIn = await auth0.isAuthenticated();
+        const authButton = document.getElementById('authButton');
+        
+        if (isLoggedIn) {
+            authButton.innerHTML = `<i class="fas fa-sign-out-alt"></i>`;
+            authButton.onclick = logout;
+        } else {
+            authButton.innerHTML = `<i class="fas fa-sign-in-alt"></i>`;
+            authButton.onclick = login;
+        }
+    }
+    
+    // Initialize auth when page loads
+    (async function initAuth() {
+        await auth0.checkSession();
+        updateAuthUI();
+    })();
+    // ===== AUTH0 CONFIG END =====  
+    
         // Theme toggle functionality
         const themeToggle = document.getElementById('themeToggle');
         const body = document.body;
@@ -1397,11 +1456,17 @@
                 input.addEventListener('input', updateValueDisplays);
             });
             
-            // Set up simulate button
-            document.getElementById('simulateButton').addEventListener('click', function() {
+            // Set up simulate button Auth0
+            document.getElementById('simulateButton').addEventListener('click', async function() {
+                const isAuthenticated = await auth0.isAuthenticated();
+                if (!isAuthenticated) {
+                    alert('Please login to run simulations');
+                    return;
+                }
                 log('Simulate button clicked');
                 simulateAttack();
             });
+            // Set up simulate button Auth0
             
             // Set up toggle explanations
             document.getElementById('toggleExplanation').addEventListener('click', function() {
