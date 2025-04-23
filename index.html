@@ -129,25 +129,6 @@
             color: #93c5fd;
         }
     </style>
-
-    <!-- Firebase App (the core Firebase SDK) -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-    
-    <!-- Firebase Authentication -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
-
-    <script>
-      // TODO: Replace the following with your app's Firebase project configuration
-      const firebaseConfig = {
-        apiKey: "AIzaSyDFmAdg24vEhcg-Y8xQ7-rZAmth7w242F0",
-        authDomain: "sandwich-attack-simulator.firebaseapp.com",
-        // ... other configuration properties
-      };
-    
-      // Initialize Firebase
-      firebase.initializeApp(firebaseConfig);
-    </script>
-
 </head>
 <body class="min-h-screen">        
     <!-- Theme Toggle -->
@@ -164,30 +145,6 @@
                 <img src="BlockNumberZeroLogo.gif" alt="BlockNumberZero Logo" 
                      class="h-12 w-auto">
             </a>
-        <!-- Google Sign-In Button -->
-        <button id="google-signin">Sign in with Google</button>
-
-        <script>
-          // Reference to the sign-in button
-          const signInButton = document.getElementById('google-signin');
-        
-          // Add click event listener
-          signInButton.addEventListener('click', () => {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            firebase.auth().signInWithPopup(provider)
-              .then((result) => {
-                // Successful sign-in
-                const user = result.user;
-                console.log('User signed in:', user);
-                // You can update the UI or redirect the user here
-              })
-              .catch((error) => {
-                // Handle Errors here.
-                console.error('Error during sign-in:', error);
-              });
-          });
-        </script>
-
             
             <!-- Centered Title Group -->
             <div class="flex-grow text-center">
