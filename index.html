@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <meta charset="UTF-8">
@@ -8,6 +8,32 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+      // Firebase-SDK importieren
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+      import { getAuth } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+      
+      // Firebase-Konfiguration
+      const firebaseConfig = {
+        apiKey: "AIzaSyDFmAdg24vEhcg-Y8xQ7-rZAmth7w242F0",
+        authDomain: "sandwich-attack-simulator.firebaseapp.com",
+        projectId: "sandwich-attack-simulator",
+        storageBucket: "sandwich-attack-simulator.appspot.com",
+        messagingSenderId: "971931585790",
+        appId: "1:971931585790:web:9c85bc0a01178eb1769af"
+      };
+      
+      // Firebase initialisieren
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      
+      // Globale Variablen für den Zugriff in anderen Skripten
+      window.firebaseApp = app;
+      window.firebaseAuth = auth;
+    </script>
+    
     <style>
         :root {
             --background-color: #f3f4f6;
@@ -130,432 +156,457 @@
         }
     </style>
 </head>
-<body class="min-h-screen">        
-    <!-- Theme Toggle -->
-    <div class="theme-toggle" id="themeToggle">
-        <i class="fas fa-sun"></i>
+<body class="min-h-screen">
+    <!-- Anmelde-Seite (wird angezeigt, wenn Benutzer nicht angemeldet ist) -->
+    <div id="loginPage" class="fixed inset-0 bg-white dark:bg-gray-900 z-50 flex flex-col items-center justify-center">
+      <div class="max-w-md w-full p-6 bg-white dark:bg-gray-800 shadow-md rounded-lg">
+        <h2 class="text-2xl font-bold mb-4 text-center dark:text-white">Sandwich Attack Simulator</h2>
+        <p class="mb-6 text-center text-gray-600 dark:text-gray-400">Bitte melden Sie sich an, um auf den Simulator zuzugreifen.</p>
+        <button id="google-signin" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center">
+          <span class="mr-2">
+            <svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
+              <path fill="white" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"/>
+            </svg>
+          </span>
+          Mit Google anmelden
+        </button>
+        <div id="loginError" class="mt-4 text-red-600 text-center hidden"></div>
+      </div>
     </div>
 
-    <!-- Header Section -->
-    <div class="container mx-auto px-4 py-4">
-        <div class="flex items-center">
-            <!-- Logo -->
-            <a href="https://tlinky.one/Sandwich-Attack-Simulator" target="_blank" 
-               class="hover:opacity-75 transition-opacity shrink-0 mr-4">
-                <img src="BlockNumberZeroLogo.gif" alt="BlockNumberZero Logo" 
-                     class="h-12 w-auto">
-            </a>
-            
-            <!-- Centered Title Group -->
-            <div class="flex-grow text-center">
-                <h1 class="text-3xl font-bold mb-1">Sandwich Attack Simulator (v 0.1)</h1>
-                <h2 class="text-xl secondary-text">Understand how sandwich attacks work in DeFi trading</h2>
+    <!-- Haupt-App (wird angezeigt, wenn Benutzer angemeldet ist) -->
+    <div id="appContent" class="hidden">
+        <!-- Theme Toggle -->
+        <div class="theme-toggle" id="themeToggle">
+            <i class="fas fa-sun"></i>
+        </div>
+        
+        <!-- Abmelde-Button (oben rechts) -->
+        <button id="signout-button" class="fixed top-4 right-20 bg-red-600 hover:bg-red-700 text-white font-medium py-1 px-3 rounded text-sm z-10">
+          Abmelden
+        </button>
+
+        <!-- Header Section -->
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center">
+                <!-- Logo -->
+                <a href="https://tlinky.one/Sandwich-Attack-Simulator" target="_blank" 
+                class="hover:opacity-75 transition-opacity shrink-0 mr-4">
+                    <img src="BlockNumberZeroLogo.gif" alt="BlockNumberZero Logo" 
+                        class="h-12 w-auto">
+                </a>
+                
+                <!-- Centered Title Group -->
+                <div class="flex-grow text-center">
+                    <h1 class="text-3xl font-bold mb-1">Sandwich Attack Simulator (v 0.1)</h1>
+                    <h2 class="text-xl secondary-text">Understand how sandwich attacks work in DeFi trading</h2>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Main Content -->
-    <div class="container mx-auto px-4 py-8">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Parameters Section -->
-            <div class="card p-6 rounded-lg shadow-md col-span-1">
-                <h3 class="text-xl font-semibold mb-4">Parameters</h3>
-                
-                <!-- Price Settings -->
-                <div class="mb-6">
-                    <h4 class="font-medium secondary-text mb-2">
-                        <i class="fas fa-coins mr-2"></i>Price Settings
-                    </h4>
-                    <div class="mb-3">
-                        <label class="block text-sm mb-1">ETH / USDC ratio</label>
-                        <input type="range" id="ethPrice" min="1000" max="20000" step="100" value="2000" 
-                               class="w-full h-2 rounded-lg appearance-none cursor-pointer">
-                        <div class="flex justify-between text-xs secondary-text">
-                            <span>1,000</span>
-                            <span id="ethPriceValue">2,000</span>
-                            <span>20,000</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Gas Cost -->
-                <div class="mb-6">
-                    <h4 class="font-medium secondary-text mb-2">
-                        <i class="fas fa-gas-pump mr-2"></i>Gas Cost
-                    </h4>
-                    <div class="mb-3">
-                        <label class="block text-sm mb-1">Gas price (Gwei)</label>
-                        <input type="range" id="gasPrice" min="1" max="500" step="1" value="20" 
-                               class="w-full h-2 rounded-lg appearance-none cursor-pointer">
-                        <div class="flex justify-between text-xs secondary-text">
-                            <span>1</span>
-                            <span id="gasPriceValue">20</span>
-                            <span>500</span>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="block text-sm mb-1">Gas Cost</label>
-                        <div id="gasCost" class="text-sm font-medium">0.0006 ETH</div>
-                    </div>
-                </div>
-                
-                <!-- Liquidity Pool -->
-                <div class="mb-6">
-                    <h4 class="font-medium secondary-text mb-2">
-                        <i class="fas fa-water mr-2"></i>Liquidity Pool
-                    </h4>
-                    <div class="mb-3">
-                        <label class="block text-sm mb-1">Initial ETH Reserve</label>
-                        <input type="range" id="ethReserve" min="1000" max="100000" step="10" value="10000" 
-                               class="w-full h-2 rounded-lg appearance-none cursor-pointer">
-                        <div class="flex justify-between text-xs secondary-text">
-                            <span>1k</span>
-                            <span id="ethReserveValue">10,000</span>
-                            <span>100K</span>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="block text-sm mb-1">Initial USDC Reserve</label>
-                        <input type="range" id="usdcReserve" min="1000000" max="100000000" step="10000" value="10000000" 
-                               class="w-full h-2 rounded-lg appearance-none cursor-pointer">
-                        <div class="flex justify-between text-xs secondary-text">
-                            <span>1M</span>
-                            <span id="usdcReserveValue">1,000,000</span>
-                            <span>100M</span>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="block text-sm mb-1">Pool Fee (%)</label>
-                        <input type="range" id="poolFee" min="0.1" max="1" step="0.1" value="0.3" 
-                               class="w-full h-2 rounded-lg appearance-none cursor-pointer">
-                        <div class="flex justify-between text-xs secondary-text">
-                            <span>0.1%</span>
-                            <span id="poolFeeValue">0.3%</span>
-                            <span>1%</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Victim's Trade -->
-                <div class="mb-6">
-                    <h4 class="font-medium secondary-text mb-2">
-                        <i class="fas fa-user mr-2"></i>Victim's Trade
-                    </h4>
-                    <div class="mb-3">
-                        <label class="block text-sm mb-1">Trade Amount (ETH)</label>
-                        <input type="range" id="tradeAmount" min="0.01" max="100" step="0.01" value="1" 
-                               class="w-full h-2 rounded-lg appearance-none cursor-pointer">
-                        <div class="flex justify-between text-xs secondary-text">
-                            <span>0.01</span>
-                            <span id="tradeAmountValue">1</span>
-                            <span>100</span>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="block text-sm mb-1">Slippage Tolerance (%)</label>
-                        <input type="range" id="slippageTolerance" min="0.1" max="10" step="0.1" value="0.5" 
-                               class="w-full h-2 rounded-lg appearance-none cursor-pointer">
-                        <div class="flex justify-between text-xs secondary-text">
-                            <span>0.1%</span>
-                            <span id="slippageToleranceValue">0.5%</span>
-                            <span>10%</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Attack Parameters -->
-                <div class="mb-6">
-                    <h4 class="font-medium secondary-text mb-2">
-                        <i class="fas fa-bolt mr-2"></i>Attack Parameters
-                    </h4>
-                    <div class="mb-3">
-                        <label class="block text-sm mb-1">Front-run amount (ETH)</label>
-                        <input type="range" id="frontRunAmount" min="0.001" max="100" step="0.001" value="0.5" 
-                               class="w-full h-2 rounded-lg appearance-none cursor-pointer">
-                        <div class="flex justify-between text-xs secondary-text">
-                            <span>0.001</span>
-                            <span id="frontRunAmountValue">0.5</span>
-                            <span>100</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <button id="simulateButton" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    Simulate Attack
-                </button>
-                
-                <div id="debugOutput" class="mt-4 p-3 bg-gray-100 text-xs text-gray-700 rounded overflow-auto max-h-40 hidden">
-                    <h4 class="font-bold mb-1">Debug Output:</h4>
-                    <pre id="debugLog"></pre>
-                </div>
-            </div>
-            
-            <!-- Results Section -->
-            <div class="col-span-1 md:col-span-2">
-                <!-- Price Impact Visualization -->
-                <div class="card p-6 rounded-lg shadow-md mb-6">
-                    <h3 class="text-xl font-semibold mb-4">Price Impact Visualization</h3>
-                    <div class="h-64">
-                        <canvas id="priceImpactChart"></canvas>
-                    </div>
-                    <div id="attackStatus" class="mt-4 p-3 text-center font-medium rounded"></div>
-                </div>
-                
-                <!-- Liquidity Depth Chart -->
-                <div class="card p-6 rounded-lg shadow-md mb-6">
-                    <h3 class="text-xl font-semibold mb-4">Liquidity Depth Chart</h3>
-                    <div class="h-48">
-                        <canvas id="liquidityDepthChart"></canvas>
-                    </div>
-                    <p class="mt-2 text-sm secondary-text">This chart shows how liquidity is distributed around the current price. The sandwich attack targets the slippage in this zone.</p>
-                </div>
-                
-                <!-- Pool State Updates -->
-                <div class="card p-6 rounded-lg shadow-md mb-6">
-                    <h3 class="text-xl font-semibold mb-4">Pool State Updates</h3>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead>
-                                <tr>
-                                    <th class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider">Stage</th>
-                                    <th class="px-4 py-2 text-right text-xs font-medium uppercase tracking-wider">ETH Reserve</th>
-                                    <th class="px-4 py-2 text-right text-xs font-medium uppercase tracking-wider">USDC Reserve</th>
-                                    <th class="px-4 py-2 text-right text-xs font-medium uppercase tracking-wider">Price (USDC/ETH)</th>
-                                    <th class="px-4 py-2 text-right text-xs font-medium uppercase tracking-wider">Constant K</th>
-                                </tr>
-                            </thead>
-                            <tbody id="poolStateTableBody" class="divide-y divide-gray-200">
-                                <!-- Will be populated by JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <!-- Attack Summary -->
-                <div class="card p-6 rounded-lg shadow-md mb-6">
-                    <h3 class="text-xl font-semibold mb-4">Attack Summary</h3>
+        <!-- Main Content -->
+        <div class="container mx-auto px-4 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Parameters Section -->
+                <div class="card p-6 rounded-lg shadow-md col-span-1">
+                    <h3 class="text-xl font-semibold mb-4">Parameters</h3>
                     
-                    <!-- Victim Impact -->
+                    <!-- Price Settings -->
                     <div class="mb-6">
-                        <h4 class="font-medium secondary-text mb-2">Victim Impact</h4>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <p class="text-sm secondary-text">Expected Output:</p>
-                                <p id="expectedOutput" class="font-medium">-</p>
-                            </div>
-                            <div>
-                                <p class="text-sm secondary-text">Actual Output:</p>
-                                <p id="actualOutput" class="font-medium">-</p>
-                            </div>
-                            <div>
-                                <p class="text-sm secondary-text">Price Impact:</p>
-                                <p id="priceImpact" class="font-medium">-</p>
-                            </div>
-                            <div>
-                                <p class="text-sm secondary-text">Slippage Tolerance:</p>
-                                <p id="slippageDisplay" class="font-medium">-</p>
-                            </div>
-                            <div>
-                                <p class="text-sm secondary-text">Transaction Status:</p>
-                                <p id="transactionStatus" class="font-medium">-</p>
+                        <h4 class="font-medium secondary-text mb-2">
+                            <i class="fas fa-coins mr-2"></i>Price Settings
+                        </h4>
+                        <div class="mb-3">
+                            <label class="block text-sm mb-1">ETH / USDC ratio</label>
+                            <input type="range" id="ethPrice" min="1000" max="20000" step="100" value="2000" 
+                                class="w-full h-2 rounded-lg appearance-none cursor-pointer">
+                            <div class="flex justify-between text-xs secondary-text">
+                                <span>1,000</span>
+                                <span id="ethPriceValue">2,000</span>
+                                <span>20,000</span>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Attacker's Profit -->
-                    <div>
-                        <h4 class="font-medium secondary-text mb-2">Attacker's Profit</h4>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <p class="text-sm secondary-text">Front-run Cost:</p>
-                                <p id="frontRunCost" class="font-medium">-</p>
-                            </div>
-                            <div>
-                                <p class="text-sm secondary-text">Back-run Return:</p>
-                                <p id="backRunReturn" class="font-medium">-</p>
-                            </div>
-                            <div>
-                                <p class="text-sm secondary-text">Gas Cost (Total):</p>
-                                <p id="totalGasCost" class="font-medium">-</p>
-                            </div>
-                            <div>
-                                <p class="text-sm secondary-text">Net Profit:</p>
-                                <p id="netProfit" class="font-medium">-</p>
-                            </div>
-                            <div>
-                                <p class="text-sm secondary-text">ROI:</p>
-                                <p id="roi" class="font-medium">-</p>
-                            </div>
-                            <div>
-                                <p class="text-sm secondary-text">Profitable After Gas:</p>
-                                <p id="isProfitable" class="font-medium">-</p>
+                    <!-- Gas Cost -->
+                    <div class="mb-6">
+                        <h4 class="font-medium secondary-text mb-2">
+                            <i class="fas fa-gas-pump mr-2"></i>Gas Cost
+                        </h4>
+                        <div class="mb-3">
+                            <label class="block text-sm mb-1">Gas price (Gwei)</label>
+                            <input type="range" id="gasPrice" min="1" max="500" step="1" value="20" 
+                                class="w-full h-2 rounded-lg appearance-none cursor-pointer">
+                            <div class="flex justify-between text-xs secondary-text">
+                                <span>1</span>
+                                <span id="gasPriceValue">20</span>
+                                <span>500</span>
                             </div>
                         </div>
-                        
-                        <div class="mt-4">
-                            <button id="toggleExplanation" class="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center">
-                                <span>Why is this attack profitable or not?</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
-                            <div id="attackExplanation" class="mt-2 p-3 rounded text-sm hidden">
-                                Explanation will appear here after simulation.
+                        <div class="mb-3">
+                            <label class="block text-sm mb-1">Gas Cost</label>
+                            <div id="gasCost" class="text-sm font-medium">0.0006 ETH</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Liquidity Pool -->
+                    <div class="mb-6">
+                        <h4 class="font-medium secondary-text mb-2">
+                            <i class="fas fa-water mr-2"></i>Liquidity Pool
+                        </h4>
+                        <div class="mb-3">
+                            <label class="block text-sm mb-1">Initial ETH Reserve</label>
+                            <input type="range" id="ethReserve" min="1000" max="100000" step="10" value="10000" 
+                                class="w-full h-2 rounded-lg appearance-none cursor-pointer">
+                            <div class="flex justify-between text-xs secondary-text">
+                                <span>1k</span>
+                                <span id="ethReserveValue">10,000</span>
+                                <span>100K</span>
                             </div>
                         </div>
+                        <div class="mb-3">
+                            <label class="block text-sm mb-1">Initial USDC Reserve</label>
+                            <input type="range" id="usdcReserve" min="1000000" max="100000000" step="10000" value="10000000" 
+                                class="w-full h-2 rounded-lg appearance-none cursor-pointer">
+                            <div class="flex justify-between text-xs secondary-text">
+                                <span>1M</span>
+                                <span id="usdcReserveValue">1,000,000</span>
+                                <span>100M</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="block text-sm mb-1">Pool Fee (%)</label>
+                            <input type="range" id="poolFee" min="0.1" max="1" step="0.1" value="0.3" 
+                                class="w-full h-2 rounded-lg appearance-none cursor-pointer">
+                            <div class="flex justify-between text-xs secondary-text">
+                                <span>0.1%</span>
+                                <span id="poolFeeValue">0.3%</span>
+                                <span>1%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Victim's Trade -->
+                    <div class="mb-6">
+                        <h4 class="font-medium secondary-text mb-2">
+                            <i class="fas fa-user mr-2"></i>Victim's Trade
+                        </h4>
+                        <div class="mb-3">
+                            <label class="block text-sm mb-1">Trade Amount (ETH)</label>
+                            <input type="range" id="tradeAmount" min="0.01" max="100" step="0.01" value="1" 
+                                class="w-full h-2 rounded-lg appearance-none cursor-pointer">
+                            <div class="flex justify-between text-xs secondary-text">
+                                <span>0.01</span>
+                                <span id="tradeAmountValue">1</span>
+                                <span>100</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="block text-sm mb-1">Slippage Tolerance (%)</label>
+                            <input type="range" id="slippageTolerance" min="0.1" max="10" step="0.1" value="0.5" 
+                                class="w-full h-2 rounded-lg appearance-none cursor-pointer">
+                            <div class="flex justify-between text-xs secondary-text">
+                                <span>0.1%</span>
+                                <span id="slippageToleranceValue">0.5%</span>
+                                <span>10%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Attack Parameters -->
+                    <div class="mb-6">
+                        <h4 class="font-medium secondary-text mb-2">
+                            <i class="fas fa-bolt mr-2"></i>Attack Parameters
+                        </h4>
+                        <div class="mb-3">
+                            <label class="block text-sm mb-1">Front-run amount (ETH)</label>
+                            <input type="range" id="frontRunAmount" min="0.001" max="100" step="0.001" value="0.5" 
+                                class="w-full h-2 rounded-lg appearance-none cursor-pointer">
+                            <div class="flex justify-between text-xs secondary-text">
+                                <span>0.001</span>
+                                <span id="frontRunAmountValue">0.5</span>
+                                <span>100</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button id="simulateButton" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        Simulate Attack
+                    </button>
+                    
+                    <div id="debugOutput" class="mt-4 p-3 bg-gray-100 text-xs text-gray-700 rounded overflow-auto max-h-40 hidden">
+                        <h4 class="font-bold mb-1">Debug Output:</h4>
+                        <pre id="debugLog"></pre>
                     </div>
                 </div>
                 
-                <!-- Detailed Transaction Breakdown -->
-                <div class="card p-6 rounded-lg shadow-md mb-6">
-                    <h3 class="text-xl font-semibold mb-4">Detailed Transaction Breakdown</h3>
+                <!-- Results Section -->
+                <div class="col-span-1 md:col-span-2">
+                    <!-- Price Impact Visualization -->
+                    <div class="card p-6 rounded-lg shadow-md mb-6">
+                        <h3 class="text-xl font-semibold mb-4">Price Impact Visualization</h3>
+                        <div class="h-64">
+                            <canvas id="priceImpactChart"></canvas>
+                        </div>
+                        <div id="attackStatus" class="mt-4 p-3 text-center font-medium rounded"></div>
+                    </div>
                     
-                    <!-- Front-run Transaction -->
-                    <div class="mb-4">
-                        <button class="toggle-details flex justify-between items-center w-full text-left font-medium py-2 border-b">
-                            <span>Front-run Transaction</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
-                        <div class="details-content hidden mt-2">
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <p class="text-sm secondary-text">ETH Input:</p>
-                                    <p id="frontRunEthInput" class="font-medium">-</p>
-                                </div>
-                                <div>
-                                    <p class="text-sm secondary-text">Fee:</p>
-                                    <p id="frontRunFee" class="font-medium">-</p>
-                                </div>
-                                <div>
-                                    <p class="text-sm secondary-text">ETH After Fee:</p>
-                                    <p id="frontRunEthAfterFee" class="font-medium">-</p>
-                                </div>
-                                <div>
-                                    <p class="text-sm secondary-text">USDC Output:</p>
-                                    <p id="frontRunUsdcOutput" class="font-medium">-</p>
-                                </div>
-                                <div>
-                                    <p class="text-sm secondary-text">Calculation:</p>
-                                    <p id="frontRunCalculation" class="font-medium">-</p>
-                                </div>
-                                <div>
-                                    <p class="text-sm secondary-text">New Pool Price:</p>
-                                    <p id="frontRunNewPrice" class="font-medium">-</p>
-                                </div>
-                            </div>
+                    <!-- Liquidity Depth Chart -->
+                    <div class="card p-6 rounded-lg shadow-md mb-6">
+                        <h3 class="text-xl font-semibold mb-4">Liquidity Depth Chart</h3>
+                        <div class="h-48">
+                            <canvas id="liquidityDepthChart"></canvas>
+                        </div>
+                        <p class="mt-2 text-sm secondary-text">This chart shows how liquidity is distributed around the current price. The sandwich attack targets the slippage in this zone.</p>
+                    </div>
+                    
+                    <!-- Pool State Updates -->
+                    <div class="card p-6 rounded-lg shadow-md mb-6">
+                        <h3 class="text-xl font-semibold mb-4">Pool State Updates</h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead>
+                                    <tr>
+                                        <th class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider">Stage</th>
+                                        <th class="px-4 py-2 text-right text-xs font-medium uppercase tracking-wider">ETH Reserve</th>
+                                        <th class="px-4 py-2 text-right text-xs font-medium uppercase tracking-wider">USDC Reserve</th>
+                                        <th class="px-4 py-2 text-right text-xs font-medium uppercase tracking-wider">Price (USDC/ETH)</th>
+                                        <th class="px-4 py-2 text-right text-xs font-medium uppercase tracking-wider">Constant K</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="poolStateTableBody" class="divide-y divide-gray-200">
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                     
-                    <!-- Victim's Transaction -->
-                    <div class="mb-4">
-                        <button class="toggle-details flex justify-between items-center w-full text-left font-medium py-2 border-b">
-                            <span>Victim's Transaction</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
-                        <div class="details-content hidden mt-2">
+                    <!-- Attack Summary -->
+                    <div class="card p-6 rounded-lg shadow-md mb-6">
+                        <h3 class="text-xl font-semibold mb-4">Attack Summary</h3>
+                        
+                        <!-- Victim Impact -->
+                        <div class="mb-6">
+                            <h4 class="font-medium secondary-text mb-2">Victim Impact</h4>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <p class="text-sm secondary-text">ETH Input:</p>
-                                    <p id="victimEthInput" class="font-medium">-</p>
+                                    <p class="text-sm secondary-text">Expected Output:</p>
+                                    <p id="expectedOutput" class="font-medium">-</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm secondary-text">Fee:</p>
-                                    <p id="victimFee" class="font-medium">-</p>
+                                    <p class="text-sm secondary-text">Actual Output:</p>
+                                    <p id="actualOutput" class="font-medium">-</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm secondary-text">ETH After Fee:</p>
-                                    <p id="victimEthAfterFee" class="font-medium">-</p>
-                                </div>
-                                <div>
-                                    <p class="text-sm secondary-text">Expected Output (Initial Pool):</p>
-                                    <p id="victimExpectedOutput" class="font-medium">-</p>
-                                </div>
-                                <div>
-                                    <p class="text-sm secondary-text">Actual Output (After Front-run):</p>
-                                    <p id="victimActualOutput" class="font-medium">-</p>
-                                </div>
-                                <div>
-                                    <p class="text-sm secondary-text">Difference:</p>
-                                    <p id="victimDifference" class="font-medium">-</p>
+                                    <p class="text-sm secondary-text">Price Impact:</p>
+                                    <p id="priceImpact" class="font-medium">-</p>
                                 </div>
                                 <div>
                                     <p class="text-sm secondary-text">Slippage Tolerance:</p>
-                                    <p id="victimSlippageTolerance" class="font-medium">-</p>
+                                    <p id="slippageDisplay" class="font-medium">-</p>
                                 </div>
                                 <div>
                                     <p class="text-sm secondary-text">Transaction Status:</p>
-                                    <p id="victimTransactionStatus" class="font-medium">-</p>
+                                    <p id="transactionStatus" class="font-medium">-</p>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <!-- Back-run Transaction -->
-                    <div class="mb-4">
-                        <button class="toggle-details flex justify-between items-center w-full text-left font-medium py-2 border-b">
-                            <span>Back-run Transaction</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
-                        <div class="details-content hidden mt-2">
+                        
+                        <!-- Attacker's Profit -->
+                        <div>
+                            <h4 class="font-medium secondary-text mb-2">Attacker's Profit</h4>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <p class="text-sm secondary-text">USDC Input:</p>
-                                    <p id="backRunUsdcInput" class="font-medium">-</p>
+                                    <p class="text-sm secondary-text">Front-run Cost:</p>
+                                    <p id="frontRunCost" class="font-medium">-</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm secondary-text">Fee:</p>
-                                    <p id="backRunFee" class="font-medium">-</p>
+                                    <p class="text-sm secondary-text">Back-run Return:</p>
+                                    <p id="backRunReturn" class="font-medium">-</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm secondary-text">USDC After Fee:</p>
-                                    <p id="backRunUsdcAfterFee" class="font-medium">-</p>
+                                    <p class="text-sm secondary-text">Gas Cost (Total):</p>
+                                    <p id="totalGasCost" class="font-medium">-</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm secondary-text">ETH Output:</p>
-                                    <p id="backRunEthOutput" class="font-medium">-</p>
+                                    <p class="text-sm secondary-text">Net Profit:</p>
+                                    <p id="netProfit" class="font-medium">-</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm secondary-text">Calculation:</p>
-                                    <p id="backRunCalculation" class="font-medium">-</p>
+                                    <p class="text-sm secondary-text">ROI:</p>
+                                    <p id="roi" class="font-medium">-</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm secondary-text">Final Pool Price:</p>
-                                    <p id="backRunFinalPrice" class="font-medium">-</p>
+                                    <p class="text-sm secondary-text">Profitable After Gas:</p>
+                                    <p id="isProfitable" class="font-medium">-</p>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <button id="toggleExplanation" class="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center">
+                                    <span>Why is this attack profitable or not?</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div id="attackExplanation" class="mt-2 p-3 rounded text-sm hidden">
+                                    Explanation will appear here after simulation.
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Mathematical Breakdown -->
-                    <div>
-                        <button class="toggle-details flex justify-between items-center w-full text-left font-medium py-2 border-b">
-                            <span>Mathematical Breakdown</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
-                        <div class="details-content hidden mt-2">
-                            <div class="mb-3">
-                                <h5 class="font-medium">Constant Product Formula</h5>
-                                <p class="text-sm">The core formula that AMMs use: x * y = k, where x and y are token reserves and k is a constant. For any trade, the product of reserves must remain constant (except for fee accumulation).</p>
+                    <!-- Detailed Transaction Breakdown -->
+                    <div class="card p-6 rounded-lg shadow-md mb-6">
+                        <h3 class="text-xl font-semibold mb-4">Detailed Transaction Breakdown</h3>
+                        
+                        <!-- Front-run Transaction -->
+                        <div class="mb-4">
+                            <button class="toggle-details flex justify-between items-center w-full text-left font-medium py-2 border-b">
+                                <span>Front-run Transaction</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <div class="details-content hidden mt-2">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <p class="text-sm secondary-text">ETH Input:</p>
+                                        <p id="frontRunEthInput" class="font-medium">-</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm secondary-text">Fee:</p>
+                                        <p id="frontRunFee" class="font-medium">-</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm secondary-text">ETH After Fee:</p>
+                                        <p id="frontRunEthAfterFee" class="font-medium">-</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm secondary-text">USDC Output:</p>
+                                        <p id="frontRunUsdcOutput" class="font-medium">-</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm secondary-text">Calculation:</p>
+                                        <p id="frontRunCalculation" class="font-medium">-</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm secondary-text">New Pool Price:</p>
+                                        <p id="frontRunNewPrice" class="font-medium">-</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="mb-3">
-                                <h5 class="font-medium">Front-run Calculation</h5>
-                                <p id="mathFrontRun" class="text-sm">tokenOutput = y - k / (x + ethInput * (1 - fee))</p>
+                        </div>
+                        
+                        <!-- Victim's Transaction -->
+                        <div class="mb-4">
+                            <button class="toggle-details flex justify-between items-center w-full text-left font-medium py-2 border-b">
+                                <span>Victim's Transaction</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <div class="details-content hidden mt-2">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <p class="text-sm secondary-text">ETH Input:</p>
+                                        <p id="victimEthInput" class="font-medium">-</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm secondary-text">Fee:</p>
+                                        <p id="victimFee" class="font-medium">-</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm secondary-text">ETH After Fee:</p>
+                                        <p id="victimEthAfterFee" class="font-medium">-</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm secondary-text">Expected Output (Initial Pool):</p>
+                                        <p id="victimExpectedOutput" class="font-medium">-</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm secondary-text">Actual Output (After Front-run):</p>
+                                        <p id="victimActualOutput" class="font-medium">-</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm secondary-text">Difference:</p>
+                                        <p id="victimDifference" class="font-medium">-</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm secondary-text">Slippage Tolerance:</p>
+                                        <p id="victimSlippageTolerance" class="font-medium">-</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm secondary-text">Transaction Status:</p>
+                                        <p id="victimTransactionStatus" class="font-medium">-</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="mb-3">
-                                <h5 class="font-medium">Price Impact Calculation</h5>
-                                <p id="mathPriceImpact" class="text-sm">priceImpact = (expectedOutput - actualOutput) / expectedOutput * 100</p>
+                        </div>
+                        
+                        <!-- Back-run Transaction -->
+                        <div class="mb-4">
+                            <button class="toggle-details flex justify-between items-center w-full text-left font-medium py-2 border-b">
+                                <span>Back-run Transaction</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <div class="details-content hidden mt-2">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <p class="text-sm secondary-text">USDC Input:</p>
+                                        <p id="backRunUsdcInput" class="font-medium">-</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm secondary-text">Fee:</p>
+                                        <p id="backRunFee" class="font-medium">-</p>
+                                    </div>
+                                                                        <div>
+                                        <p class="text-sm secondary-text">USDC After Fee:</p>
+                                        <p id="backRunUsdcAfterFee" class="font-medium">-</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm secondary-text">ETH Output:</p>
+                                        <p id="backRunEthOutput" class="font-medium">-</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm secondary-text">Calculation:</p>
+                                        <p id="backRunCalculation" class="font-medium">-</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm secondary-text">Final Pool Price:</p>
+                                        <p id="backRunFinalPrice" class="font-medium">-</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <h5 class="font-medium">Profit Calculation</h5>
-                                <p id="mathProfit" class="text-sm">profit = backRunEthOutput - frontRunAmount - gasCost</p>
+                        </div>
+                        
+                        <!-- Mathematical Breakdown -->
+                        <div>
+                            <button class="toggle-details flex justify-between items-center w-full text-left font-medium py-2 border-b">
+                                <span>Mathematical Breakdown</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <div class="details-content hidden mt-2">
+                                <div class="mb-3">
+                                    <h5 class="font-medium">Constant Product Formula</h5>
+                                    <p class="text-sm">The core formula that AMMs use: x * y = k, where x and y are token reserves and k is a constant. For any trade, the product of reserves must remain constant (except for fee accumulation).</p>
+                                </div>
+                                <div class="mb-3">
+                                    <h5 class="font-medium">Front-run Calculation</h5>
+                                    <p id="mathFrontRun" class="text-sm">tokenOutput = y - k / (x + ethInput * (1 - fee))</p>
+                                </div>
+                                <div class="mb-3">
+                                    <h5 class="font-medium">Price Impact Calculation</h5>
+                                    <p id="mathPriceImpact" class="text-sm">priceImpact = (expectedOutput - actualOutput) / expectedOutput * 100</p>
+                                </div>
+                                <div>
+                                    <h5 class="font-medium">Profit Calculation</h5>
+                                    <p id="mathProfit" class="text-sm">profit = backRunEthOutput - frontRunAmount - gasCost</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -563,7 +614,73 @@
             </div>
         </div>
     </div>
- 
+    
+    <!-- Authentifizierungs-Logik -->
+    <script type="module">
+      import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+      
+      // Liste der autorisierten E-Mail-Adressen
+      const authorizedEmails = [
+	"rey.creacionweb@gmail.com",
+  	"rey.miller@hotmail.com"
+	];
+      
+      // DOM-Elemente
+      const loginPage = document.getElementById('loginPage');
+      const appContent = document.getElementById('appContent');
+      const loginError = document.getElementById('loginError');
+      const signInButton = document.getElementById('google-signin');
+      const signOutButton = document.getElementById('signout-button');
+      
+      // Authentifizierungsstatus überwachen
+      onAuthStateChanged(window.firebaseAuth, (user) => {
+        if (user) {
+          console.log('Angemeldet als:', user.email);
+          
+          // Prüfen, ob die E-Mail-Adresse autorisiert ist
+          if (authorizedEmails.includes(user.email) || authorizedEmails.length === 0) {
+            // Autorisierter Benutzer oder keine Einschränkungen - App anzeigen
+            loginPage.classList.add('hidden');
+            appContent.classList.remove('hidden');
+          } else {
+            // Nicht autorisierter Benutzer - Fehlermeldung anzeigen
+            loginError.textContent = "Sie sind nicht berechtigt, auf diese Anwendung zuzugreifen.";
+            loginError.classList.remove('hidden');
+            
+            // Benutzer abmelden
+            window.firebaseAuth.signOut();
+          }
+        } else {
+          // Benutzer ist nicht angemeldet - Login-Seite anzeigen
+          loginPage.classList.remove('hidden');
+          appContent.classList.add('hidden');
+        }
+      });
+      
+      // Event-Listener für den Anmelde-Button
+      signInButton.addEventListener('click', () => {
+        loginError.classList.add('hidden');
+        const provider = new GoogleAuthProvider();
+        signInWithPopup(window.firebaseAuth, provider)
+          .catch((error) => {
+            console.error('Anmeldefehler:', error);
+            loginError.textContent = "Anmeldefehler: " + error.message;
+            loginError.classList.remove('hidden');
+          });
+      });
+      
+      // Event-Listener für den Abmelde-Button
+      signOutButton.addEventListener('click', () => {
+        window.firebaseAuth.signOut()
+          .then(() => {
+            console.log('Erfolgreich abgemeldet');
+          })
+          .catch((error) => {
+            console.error('Abmeldefehler:', error);
+          });
+      });
+    </script>
+    
     <script>
         // Theme toggle functionality
         const themeToggle = document.getElementById('themeToggle');
