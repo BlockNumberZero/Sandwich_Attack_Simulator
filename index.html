@@ -162,14 +162,68 @@
       <div class="max-w-md w-full p-6 bg-white dark:bg-gray-800 shadow-md rounded-lg">
         <h2 class="text-2xl font-bold mb-4 text-center dark:text-white">Sandwich Attack Simulator</h2>
         <p class="mb-6 text-center text-gray-600 dark:text-gray-400">Bitte melden Sie sich an, um auf den Simulator zuzugreifen.</p>
-        <button id="google-signin" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center">
-          <span class="mr-2">
-            <svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
-              <path fill="white" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"/>
-            </svg>
-          </span>
-          Mit Google anmelden
-        </button>
+        
+        <!-- Tabs für Anmeldemethoden -->
+        <div class="mb-4 border-b border-gray-200">
+          <ul class="flex flex-wrap -mb-px">
+            <li class="mr-2">
+              <a id="email-tab" class="inline-block py-2 px-4 text-blue-600 hover:text-blue-800 font-medium border-b-2 border-blue-600 rounded-t-lg dark:text-blue-400 dark:border-blue-400" href="#">E-Mail</a>
+            </li>
+            <li class="mr-2">
+              <a id="google-tab" class="inline-block py-2 px-4 text-gray-500 hover:text-gray-700 font-medium rounded-t-lg dark:text-gray-400 dark:hover:text-gray-300" href="#">Google</a>
+            </li>
+            <li>
+              <a id="register-tab" class="inline-block py-2 px-4 text-gray-500 hover:text-gray-700 font-medium rounded-t-lg dark:text-gray-400 dark:hover:text-gray-300" href="#">Registrieren</a>
+            </li>
+          </ul>
+        </div>
+        
+        <!-- E-Mail-Login-Formular -->
+        <div id="email-login" class="login-form">
+          <div class="mb-4">
+            <label class="block text-sm font-medium mb-1 dark:text-white" for="email">E-Mail-Adresse</label>
+            <input id="email" type="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="ihre@email.de">
+          </div>
+          <div class="mb-6">
+            <label class="block text-sm font-medium mb-1 dark:text-white" for="password">Passwort</label>
+            <input id="password" type="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="••••••••">
+          </div>
+          <button id="email-signin" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+            Anmelden
+          </button>
+        </div>
+
+        <!-- Google-Login-Button -->
+        <div id="google-login" class="login-form hidden">
+          <button id="google-signin" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center">
+            <span class="mr-2">
+              <svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
+                <path fill="white" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"/>
+              </svg>
+            </span>
+            Mit Google anmelden
+          </button>
+        </div>
+        
+        <!-- Registrierungs-Formular -->
+        <div id="register-form" class="login-form hidden">
+          <div class="mb-4">
+            <label class="block text-sm font-medium mb-1 dark:text-white" for="reg-email">E-Mail-Adresse</label>
+            <input id="reg-email" type="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="ihre@email.de">
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium mb-1 dark:text-white" for="reg-password">Passwort</label>
+            <input id="reg-password" type="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Mindestens 6 Zeichen">
+          </div>
+          <div class="mb-6">
+            <label class="block text-sm font-medium mb-1 dark:text-white" for="reg-password-confirm">Passwort bestätigen</label>
+            <input id="reg-password-confirm" type="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Passwort wiederholen">
+          </div>
+          <button id="register-button" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-green-500">
+            Registrieren
+          </button>
+        </div>
+	
         <div id="loginError" class="mt-4 text-red-600 text-center hidden"></div>
       </div>
     </div>
@@ -617,29 +671,107 @@
     
     <!-- Authentifizierungs-Logik -->
     <script type="module">
-      import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+      import { 
+        signInWithPopup, 
+        GoogleAuthProvider, 
+        signInWithEmailAndPassword, 
+        createUserWithEmailAndPassword,
+        onAuthStateChanged 
+      } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
       
       // Liste der autorisierten E-Mail-Adressen
       const authorizedEmails = [
-	"rey.creacionweb@gmail.com",
-  	"rey.miller.chancahuana.almora@gmail.com",
-	"Kgotlellovic@gmail.com",
-	"rozjebanej90@gmail.com",
-	"joyceyyc@gmail.com",
-	"wiro.pribadi@gmail.com",
-	"bushel-elevens-9k@icloud.com",
+        "rey.creacionweb@gmail.com",
+        "rey.miller.chancahuana.almora@gmail.com",
+        "Kgotlellovic@gmail.com",
+        "rozjebanej90@gmail.com",
+        "joyceyyc@gmail.com",
+        "wiro.pribadi@gmail.com",
+        "bushel-elevens-9k@icloud.com",
         "david@hackernoon.com"
-	];
+      ];
+      
+      // Liste der autorisierten Domains
       const authorizedDomains = [
         "hackernoon.com",
-        "icloud.com"
+        "icloud.com",
+        "gmail.com" // Für Testzwecke, kann später entfernt werden
       ];
+      
       // DOM-Elemente
       const loginPage = document.getElementById('loginPage');
       const appContent = document.getElementById('appContent');
       const loginError = document.getElementById('loginError');
       const signInButton = document.getElementById('google-signin');
+      const emailSignInButton = document.getElementById('email-signin');
+      const registerButton = document.getElementById('register-button');
       const signOutButton = document.getElementById('signout-button');
+      
+      // Tab-Elemente
+      const emailTab = document.getElementById('email-tab');
+      const googleTab = document.getElementById('google-tab');
+      const registerTab = document.getElementById('register-tab');
+      const emailLogin = document.getElementById('email-login');
+      const googleLogin = document.getElementById('google-login');
+      const registerForm = document.getElementById('register-form');
+      
+      // Tab-Wechsel-Funktionen
+      emailTab.addEventListener('click', (e) => {
+        e.preventDefault();
+        setActiveTab(emailTab, emailLogin);
+      });
+      
+      googleTab.addEventListener('click', (e) => {
+        e.preventDefault();
+        setActiveTab(googleTab, googleLogin);
+      });
+      
+      registerTab.addEventListener('click', (e) => {
+        e.preventDefault();
+        setActiveTab(registerTab, registerForm);
+      });
+      
+      function setActiveTab(tab, content) {
+        // Alle Tabs zurücksetzen
+        [emailTab, googleTab, registerTab].forEach(t => {
+          t.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600', 'dark:text-blue-400', 'dark:border-blue-400');
+          t.classList.add('text-gray-500', 'hover:text-gray-700', 'dark:text-gray-400', 'dark:hover:text-gray-300');
+        });
+        
+        // Aktiven Tab setzen
+        tab.classList.remove('text-gray-500', 'hover:text-gray-700', 'dark:text-gray-400', 'dark:hover:text-gray-300');
+        tab.classList.add('text-blue-600', 'border-b-2', 'border-blue-600', 'dark:text-blue-400', 'dark:border-blue-400');
+        
+        // Alle Inhalte ausblenden
+        [emailLogin, googleLogin, registerForm].forEach(c => {
+          c.classList.add('hidden');
+        });
+        
+        // Gewählten Inhalt anzeigen
+        content.classList.remove('hidden');
+        
+        // Fehlermeldung zurücksetzen
+        loginError.classList.add('hidden');
+      }
+      
+      // Prüfen, ob eine E-Mail autorisiert ist
+      function isAuthorizedEmail(email) {
+        if (!email) return false;
+        
+        // Direkte Überprüfung der E-Mail-Adresse
+        if (authorizedEmails.includes(email.toLowerCase())) {
+          return true;
+        }
+        
+        // Überprüfung der Domain
+        const domain = email.split('@')[1];
+        if (domain && authorizedDomains.includes(domain.toLowerCase())) {
+          return true;
+        }
+        
+        // Keine Autorisierung gefunden
+        return false;
+      }
       
       // Authentifizierungsstatus überwachen
       onAuthStateChanged(window.firebaseAuth, (user) => {
@@ -647,8 +779,8 @@
           console.log('Angemeldet als:', user.email);
           
           // Prüfen, ob die E-Mail-Adresse autorisiert ist
-          if (authorizedEmails.includes(user.email) || authorizedEmails.length === 0) {
-            // Autorisierter Benutzer oder keine Einschränkungen - App anzeigen
+          if (isAuthorizedEmail(user.email)) {
+            // Autorisierter Benutzer - App anzeigen
             loginPage.classList.add('hidden');
             appContent.classList.remove('hidden');
           } else {
@@ -666,14 +798,101 @@
         }
       });
       
-      // Event-Listener für den Anmelde-Button
+      // Event-Listener für den Google-Anmelde-Button
       signInButton.addEventListener('click', () => {
         loginError.classList.add('hidden');
         const provider = new GoogleAuthProvider();
         signInWithPopup(window.firebaseAuth, provider)
           .catch((error) => {
             console.error('Anmeldefehler:', error);
-            loginError.textContent = "Anmeldefehler: " + error.message;
+            loginError.textContent = "Google-Anmeldefehler: " + error.message;
+            loginError.classList.remove('hidden');
+          });
+      });
+      
+      // Event-Listener für den E-Mail-Anmelde-Button
+      emailSignInButton.addEventListener('click', () => {
+        loginError.classList.add('hidden');
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        
+        if (!email || !password) {
+          loginError.textContent = "Bitte geben Sie E-Mail und Passwort ein";
+          loginError.classList.remove('hidden');
+          return;
+        }
+        
+        signInWithEmailAndPassword(window.firebaseAuth, email, password)
+          .catch((error) => {
+            console.error('E-Mail-Anmeldefehler:', error);
+            let errorMessage = error.message;
+            
+            // Benutzerfreundlichere Fehlermeldungen
+            if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
+              errorMessage = "Ungültige E-Mail-Adresse oder falsches Passwort.";
+            } else if (error.code === 'auth/user-not-found') {
+              errorMessage = "Kein Benutzerkonto mit dieser E-Mail-Adresse gefunden.";
+            }
+            
+            loginError.textContent = errorMessage;
+            loginError.classList.remove('hidden');
+          });
+      });
+      
+      // Event-Listener für den Registrierungs-Button
+      registerButton.addEventListener('click', () => {
+        loginError.classList.add('hidden');
+        const email = document.getElementById('reg-email').value;
+        const password = document.getElementById('reg-password').value;
+        const passwordConfirm = document.getElementById('reg-password-confirm').value;
+        
+        if (!email || !password || !passwordConfirm) {
+          loginError.textContent = "Bitte füllen Sie alle Felder aus";
+          loginError.classList.remove('hidden');
+          return;
+        }
+        
+        if (password !== passwordConfirm) {
+          loginError.textContent = "Die Passwörter stimmen nicht überein";
+          loginError.classList.remove('hidden');
+          return;
+        }
+        
+        if (password.length < 6) {
+          loginError.textContent = "Das Passwort muss mindestens 6 Zeichen lang sein";
+          loginError.classList.remove('hidden');
+          return;
+        }
+        
+        // Vor der Registrierung prüfen, ob die E-Mail autorisiert ist
+        if (!isAuthorizedEmail(email)) {
+          loginError.textContent = "Diese E-Mail-Adresse ist nicht für die Registrierung zugelassen";
+          loginError.classList.remove('hidden');
+          return;
+        }
+        
+        createUserWithEmailAndPassword(window.firebaseAuth, email, password)
+          .then(() => {
+            // Registrierung erfolgreich
+            console.log('Benutzer erfolgreich registriert');
+            // Zurück zum Login-Tab wechseln
+            setActiveTab(emailTab, emailLogin);
+            document.getElementById('email').value = email;
+          })
+          .catch((error) => {
+            console.error('Registrierungsfehler:', error);
+            let errorMessage = error.message;
+            
+            // Benutzerfreundlichere Fehlermeldungen
+            if (error.code === 'auth/email-already-in-use') {
+              errorMessage = "Ein Benutzerkonto mit dieser E-Mail-Adresse existiert bereits.";
+            } else if (error.code === 'auth/invalid-email') {
+              errorMessage = "Die E-Mail-Adresse ist ungültig.";
+            } else if (error.code === 'auth/weak-password') {
+              errorMessage = "Das Passwort ist zu schwach. Bitte wählen Sie ein stärkeres Passwort.";
+            }
+            
+            loginError.textContent = errorMessage;
             loginError.classList.remove('hidden');
           });
       });
