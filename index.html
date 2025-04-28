@@ -196,9 +196,7 @@
             <li class="mr-2">
               <a id="google-tab" class="inline-block py-2 px-4 text-gray-500 hover:text-gray-700 font-medium rounded-t-lg dark:text-gray-400 dark:hover:text-gray-300" href="#">Google</a>
             </li>
-            <li class="mr-2">
-              <a id="microsoft-tab" class="inline-block py-2 px-4 text-gray-500 hover:text-gray-700 font-medium rounded-t-lg dark:text-gray-400 dark:hover:text-gray-300" href="#">Microsoft</a>
-            </li>
+            
             <li>
               <a id="register-tab" class="inline-block py-2 px-4 text-gray-500 hover:text-gray-700 font-medium rounded-t-lg dark:text-gray-400 dark:hover:text-gray-300" href="#">Registrieren</a>
             </li>
@@ -229,18 +227,6 @@
               </svg>
             </span>
             Mit Google anmelden
-          </button>
-        </div>
-        
-        <!-- Microsoft-Login-Button -->
-        <div id="microsoft-login" class="login-form hidden">
-          <button id="microsoft-signin" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center">
-            <span class="mr-2">
-              <svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 23 23">
-                <path fill="white" d="M11.4 24H0V12.6h11.4V24zM24 24H12.6V12.6H24V24zM11.4 11.4H0V0h11.4v11.4zM24 11.4H12.6V0H24v11.4z"/>
-              </svg>
-            </span>
-            Mit Microsoft anmelden
           </button>
         </div>
         
@@ -729,7 +715,7 @@
         "wiro.pribadi@gmail.com",
         "bushel-elevens-9k@icloud.com",
         "david@hackernoon.com",
-        "rey.miller@hotmail.com" // Microsoft-Account hinzugefügt
+        "rey.miller@hotmail.com" // Microsoft-Account added, without using Microsoft access tab
       ];
       
       // DOM-Elemente
@@ -737,7 +723,6 @@
       const appContent = document.getElementById('appContent');
       const loginError = document.getElementById('loginError');
       const signInButton = document.getElementById('google-signin');
-      const microsoftSignInButton = document.getElementById('microsoft-signin');
       const emailSignInButton = document.getElementById('email-signin');
       const registerButton = document.getElementById('register-button');
       const signOutButton = document.getElementById('signout-button');
@@ -745,11 +730,9 @@
       // Tab-Elemente
       const emailTab = document.getElementById('email-tab');
       const googleTab = document.getElementById('google-tab');
-      const microsoftTab = document.getElementById('microsoft-tab');
       const registerTab = document.getElementById('register-tab');
       const emailLogin = document.getElementById('email-login');
       const googleLogin = document.getElementById('google-login');
-      const microsoftLogin = document.getElementById('microsoft-login');
       const registerForm = document.getElementById('register-form');
       
       // Tab-Wechsel-Funktionen
@@ -763,11 +746,6 @@
         setActiveTab(googleTab, googleLogin);
       });
       
-      microsoftTab.addEventListener('click', (e) => {
-        e.preventDefault();
-        setActiveTab(microsoftTab, microsoftLogin);
-      });
-      
       registerTab.addEventListener('click', (e) => {
         e.preventDefault();
         setActiveTab(registerTab, registerForm);
@@ -775,7 +753,7 @@
       
       function setActiveTab(tab, content) {
         // Alle Tabs zurücksetzen
-        [emailTab, googleTab, microsoftTab, registerTab].forEach(t => {
+        [emailTab, googleTab, registerTab].forEach(t => {
           t.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600', 'dark:text-blue-400', 'dark:border-blue-400');
           t.classList.add('text-gray-500', 'hover:text-gray-700', 'dark:text-gray-400', 'dark:hover:text-gray-300');
         });
@@ -785,7 +763,7 @@
         tab.classList.add('text-blue-600', 'border-b-2', 'border-blue-600', 'dark:text-blue-400', 'dark:border-blue-400');
         
         // Alle Inhalte ausblenden
-        [emailLogin, googleLogin, microsoftLogin, registerForm].forEach(c => {
+        [emailLogin, googleLogin, registerForm].forEach(c => {
           c.classList.add('hidden');
         });
         
@@ -837,18 +815,6 @@
           .catch((error) => {
             console.error('Anmeldefehler:', error);
             loginError.textContent = "Google-Anmeldefehler: " + error.message;
-            loginError.classList.remove('hidden');
-          });
-      });
-      
-      // Event-Listener für den Microsoft-Anmelde-Button
-      microsoftSignInButton.addEventListener('click', () => {
-        loginError.classList.add('hidden');
-        const provider = new OAuthProvider('microsoft.com');
-        signInWithPopup(window.firebaseAuth, provider)
-          .catch((error) => {
-            console.error('Microsoft-Anmeldefehler:', error);
-            loginError.textContent = "Microsoft-Anmeldefehler: " + error.message;
             loginError.classList.remove('hidden');
           });
       });
