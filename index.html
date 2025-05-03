@@ -800,7 +800,7 @@
   if (user) {
     try {
       // 1. Create document reference
-      const userDocRef = doc(window.firebaseDb, 'allowed_emails', user.email);
+      const userDocRef = doc(window.firebaseDb, 'allowed_emails', user.email.toLowerCase());
       
       // 2. Get document snapshot
       const userDoc = await getDoc(userDocRef);
