@@ -1916,6 +1916,44 @@ registerButton.addEventListener('click', async () => {
             // Run initial simulation
             simulateAttack();
         });
+
+        <!-- Debug Panel (Add this just before </body> tag) -->
+<div id="debugPanel" style="position: fixed; bottom: 0; left: 0; background: rgba(0,0,0,0.8); color: white; padding: 10px; max-width: 100%; max-height: 200px; overflow: auto; font-family: monospace; font-size: 12px; z-index: 9999;">
+  <h4>Debug Info:</h4>
+  <div id="debugLog"></div>
+</div>
+
+<script>
+  // Debug logging function
+  function debugLog(message) {
+    console.log(message);
+    const logDiv = document.getElementById('debugLog');
+    const logEntry = document.createElement('div');
+    logEntry.textContent = new Date().toLocaleTimeString() + ': ' + message;
+    logDiv.appendChild(logEntry);
+    
+    // Keep only latest 20 entries
+    while (logDiv.children.length > 20) {
+      logDiv.removeChild(logDiv.firstChild);
+    }
+  }
+  
+  // Add these debug listeners
+  const auth = window.firebaseAuth;
+  if (auth) {
+    debugLog('Auth object found');
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        debugLog(`Auth state changed: User signed in (${user.email})`);
+      } else {
+        debugLog('Auth state changed: No user');
+      }
+    });
+  } else {
+    debugLog('WARNING: Auth object not found!');
+  }
+</script>
+
     </script>
     <script type="module" src="main.js"></script>
 </body>
