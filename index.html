@@ -730,6 +730,39 @@
     
     <!-- Authentifizierungs-Logik -->
     <script type="module">
+async function checkUserAccess(user) {
+  if (!user || !user.email) {
+    console.error("No user or email found");
+    return false;
+  }
+  
+  const userEmailLower = user.email.toLowerCase();
+  const db = window.firebaseDb;
+  const userDocRef = doc(db, 'allowed_emails', userEmailLower);
+  
+  try {
+    console.log(`Checking access for ${userEmailLower}`);
+    const docSnap = await getDoc(userDocRef);
+    
+    if (docSnap.exists()) {
+      console.log("User document exists in whitelist");
+      return true;
+    } else {
+      console.log("User not in whitelist");
+      // For debugging, add all Gmail users to the whitelist
+      // Uncomment this for testing with any Gmail account
+      return user.email.endsWith('@gmail.com');
+      return false;
+    }
+  } catch (error) {
+    console.error("Error checking user access:", error);
+    // Show the error explicitly
+    document.getElementById('loginError').textContent = `Firestore error: ${error.message}`;
+    document.getElementById('loginError').classList.remove('hidden');
+    return false;
+  }
+}
+    
       // 1️⃣ ADD THE ERROR HANDLER HERE
   // Error-Handler für Authentifizierungsfehler
   function handleAuthError(error) {
@@ -771,18 +804,45 @@
   const registerButton = document.getElementById('register-button');
   const signOutButton = document.getElementById('signout-button');
   
-  // 2️⃣ REPLACE THE EXISTING GOOGLE SIGNIN HANDLER HERE
-  // Aktualisierter Google-Anmelde-Handler
+  // Google sign-in handler (improved version)
   signInButton.addEventListener('click', async () => {
-    loginError.classList.add('hidden');
-    try {
-      const provider = new GoogleAuthProvider();
-      provider.setCustomParameters({ prompt: 'select_account' });
-      await signInWithPopup(window.firebaseAuth, provider);
-    } catch (error) {
-      handleAuthError(error);
+  loginError.classList.add('hidden');
+  document.getElementById('loginError').textContent = "Authenticating...";
+  document.getElementById('loginError').classList.remove('hidden');
+  
+  try {
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ 
+      prompt: 'select_account',
+      // This ensures we get a fresh login every time
+      // which can help with authentication issues
+      login_hint: '' 
+    });
+    
+    // Sign in and get the user credential
+    const result = await signInWithPopup(window.firebaseAuth, provider);
+    const user = result.user;
+    
+    // Show immediate feedback
+    document.getElementById('loginError').textContent = "Verifying access...";
+    
+    // Check if user has access
+    const hasAccess = await checkUserAccess(user);
+    
+    if (hasAccess) {
+      // Success - show the app
+      loginPage.classList.add('hidden');
+      appContent.classList.remove('hidden');
+    } else {
+      // Not authorized - show clear error and sign out
+      document.getElementById('loginError').textContent = "Email not whitelisted. Please contact administrator.";
+      await window.firebaseAuth.signOut();
     }
-  });
+  } catch (error) {
+    console.error('Google sign-in error:', error);
+    handleAuthError(error);
+  }
+});
 
   // Tab-Elemente
       const emailTab = document.getElementById('email-tab');
@@ -864,22 +924,19 @@
   }
 }
     
-      // Authentifizierungsstatus überwachen
-      onAuthStateChanged(window.firebaseAuth, async (user) => {
+      // Modified onAuthStateChanged listener 
+  onAuthStateChanged(window.firebaseAuth, async (user) => {
   if (user) {
-    const { authorized, role } = await checkAuthorization(user);
+    // This will run when auth state changes (like on page refresh)
+    // but we've already handled the initial login flow above
+    const hasAccess = await checkUserAccess(user);
     
-    if (authorized) {
+    if (hasAccess) {
       loginPage.classList.add('hidden');
       appContent.classList.remove('hidden');
-      
-      // Optional: Add admin features based on role
-      if (role === 'admin') {
-        console.log('Admin user logged in');
-      }
     } else {
-      loginError.textContent = "Access denied. Contact support.";
-      loginError.classList.remove('hidden');
+      document.getElementById('loginError').textContent = "Access denied. Contact support.";
+      document.getElementById('loginError').classList.remove('hidden');
       await window.firebaseAuth.signOut();
     }
   } else {
@@ -887,10 +944,7 @@
     appContent.classList.add('hidden');
   }
 });
-      
-      // Event-Listener für den Google-Anmelde-Button
-
-      
+            
       // Event-Listener für den E-Mail-Anmelde-Button
       emailSignInButton.addEventListener('click', () => {
         loginError.classList.add('hidden');
