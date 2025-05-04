@@ -738,6 +738,7 @@
     document.getElementById('loginError').classList.remove('hidden');
   }
 
+        
   import { 
     signInWithPopup, 
     GoogleAuthProvider, 
@@ -746,6 +747,7 @@
     createUserWithEmailAndPassword,
     onAuthStateChanged 
   } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
   
   // DOM-Elemente
   const loginPage = document.getElementById('loginPage');
@@ -823,7 +825,32 @@
         // Auf Kleinbuchstaben normalisieren für den Vergleich
         return authorizedEmails.map(e => e.toLowerCase()).includes(email.toLowerCase());
       }
-      
+
+    // Checking authorisation
+  async function checkAuthorization(user) {
+  if (!user || !user.email) {
+    return { authorized: false, role: 'none' };
+  }
+
+  const userEmailLower = user.email.toLowerCase();
+  const userDocRef = doc(db, 'allowed_emails', userEmailLower);
+
+  try {
+    const docSnap = await getDoc(userDocRef);
+
+    if (docSnap.exists()) {
+      const userData = docSnap.data();
+      return { authorized: true, role: userData.role || 'user' };
+    } else {
+      return { authorized: false, role: 'none' };
+    }
+  } catch (error) {
+    console.error("Error checking authorization:", error);
+    handleAuthError(error); // Use your existing error handler
+    return { authorized: false, role: 'none' };
+  }
+}
+    
       // Authentifizierungsstatus überwachen
       onAuthStateChanged(window.firebaseAuth, async (user) => {
   if (user) {
@@ -909,7 +936,7 @@ registerButton.addEventListener('click', async () => {
   // Firestore authorization check
   try {
     const normalizedEmail = email.toLowerCase();
-    const userDocRef = doc(window.firebaseDb, 'allowed_emails', normalizedEmail);
+    const userDocRef = doc(window.firebasedb, 'allowed_emails', normalizedEmail);
     const userDoc = await getDoc(userDocRef);
 
     if (!userDoc.exists()) {
