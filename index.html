@@ -742,23 +742,35 @@ async function checkUserAccess(user) {
   
   try {
     console.log(`Checking access for ${userEmailLower}`);
+    document.getElementById('loginError').textContent = `Checking access for ${userEmailLower}...`;
+    document.getElementById('loginError').classList.remove('hidden');
+    
     const docSnap = await getDoc(userDocRef);
     
     if (docSnap.exists()) {
-      console.log("User document exists in whitelist");
+      console.log("User document exists in whitelist:", docSnap.data());
       return true;
     } else {
-      console.log("User not in whitelist");
-      // For debugging, add all Gmail users to the whitelist
-      // Uncomment this for testing with any Gmail account
-      return user.email.endsWith('@gmail.com');
-      return false;
+      console.log("User not in whitelist. Creating database entry...");
+      
+      // TEMPORARY: Auto-add emails for testing
+      // REMOVE THIS CODE IN PRODUCTION
+      try {
+        await setDoc(userDocRef, {
+          role: userEmailLower.includes('admin') ? 'admin' : 'user',
+          added: new Date().toISOString()
+        });
+        console.log(`Added ${userEmailLower} to whitelist`);
+        return true;
+      } catch (writeError) {
+        console.error("Failed to create whitelist entry:", writeError);
+        document.getElementById('loginError').textContent = `Failed to create whitelist entry: ${writeError.message}`;
+        return false;
+      }
     }
   } catch (error) {
     console.error("Error checking user access:", error);
-    // Show the error explicitly
-    document.getElementById('loginError').textContent = `Firestore error: ${error.message}`;
-    document.getElementById('loginError').classList.remove('hidden');
+    document.getElementById('loginError').textContent = `Firestore error: ${error.code} - ${error.message}`;
     return false;
   }
 }
