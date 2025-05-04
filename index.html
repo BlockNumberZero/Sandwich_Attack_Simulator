@@ -33,7 +33,6 @@
       // Firebase-SDK importieren
       import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
       import { getAuth } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-      import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
       
       // Firebase-Konfiguration
       const firebaseConfig = {
@@ -48,12 +47,10 @@
       // Firebase initialisieren
       const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
-      const db = getFirestore(app);
       
       // Globale Variablen für den Zugriff in anderen Skripten
       window.firebaseApp = app;
       window.firebaseAuth = auth;
-      window.firebaseDb = db;
     </script>
     
     <style>
@@ -717,59 +714,38 @@
     
     <!-- Authentifizierungs-Logik -->
     <script type="module">
-      // 1️⃣ ADD THE ERROR HANDLER HERE
-  // Error-Handler für Authentifizierungsfehler
-  function handleAuthError(error) {
-    console.error('Authentifizierungsfehler:', error);
-    let message = error.message;
-
-    // Deutsche Übersetzungen
-    if (error.code === 'permission-denied') {
-      message = "Sie haben keine Berechtigung für diese Aktion";
-    } else if (error.code === 'unauthenticated') {
-      message = "Bitte melden Sie sich an um fortzufahren";
-    } else if (error.code === 'auth/popup-blocked') {
-      message = "Bitte erlauben Sie Popups für Google-Anmeldung";
-    } else if (error.code === 'auth/popup-closed-by-user') {
-      message = "Anmeldefenster wurde geschlossen - bitte versuchen Sie es erneut";
-    }
-
-    document.getElementById('loginError').textContent = message;
-    document.getElementById('loginError').classList.remove('hidden');
-  }
-
-  import { 
-    signInWithPopup, 
-    GoogleAuthProvider, 
-    OAuthProvider,
-    signInWithEmailAndPassword, 
-    createUserWithEmailAndPassword,
-    onAuthStateChanged 
-  } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-  
-  // DOM-Elemente
-  const loginPage = document.getElementById('loginPage');
-  const appContent = document.getElementById('appContent');
-  const loginError = document.getElementById('loginError');
-  const signInButton = document.getElementById('google-signin');
-  const emailSignInButton = document.getElementById('email-signin');
-  const registerButton = document.getElementById('register-button');
-  const signOutButton = document.getElementById('signout-button');
-  
-  // 2️⃣ REPLACE THE EXISTING GOOGLE SIGNIN HANDLER HERE
-  // Aktualisierter Google-Anmelde-Handler
-  signInButton.addEventListener('click', async () => {
-    loginError.classList.add('hidden');
-    try {
-      const provider = new GoogleAuthProvider();
-      provider.setCustomParameters({ prompt: 'select_account' });
-      await signInWithPopup(window.firebaseAuth, provider);
-    } catch (error) {
-      handleAuthError(error);
-    }
-  });
-
-  // Tab-Elemente
+      import { 
+        signInWithPopup, 
+        GoogleAuthProvider, 
+        OAuthProvider,
+        signInWithEmailAndPassword, 
+        createUserWithEmailAndPassword,
+        onAuthStateChanged 
+      } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+      
+      // Liste der autorisierten E-Mail-Adressen
+      const authorizedEmails = [
+        "rey.creacionweb@gmail.com",
+        "rey.miller.chancahuana.almora@gmail.com",
+        "Kgotlellovic@gmail.com",
+        "rozjebanej90@gmail.com",
+        "joyceyyc@gmail.com",
+        "wiro.pribadi@gmail.com",
+        "bushel-elevens-9k@icloud.com",
+        "david@hackernoon.com",
+        "rey.miller@hotmail.com" // Microsoft-Account added, without using Microsoft access tab
+      ];
+      
+      // DOM-Elemente
+      const loginPage = document.getElementById('loginPage');
+      const appContent = document.getElementById('appContent');
+      const loginError = document.getElementById('loginError');
+      const signInButton = document.getElementById('google-signin');
+      const emailSignInButton = document.getElementById('email-signin');
+      const registerButton = document.getElementById('register-button');
+      const signOutButton = document.getElementById('signout-button');
+      
+      // Tab-Elemente
       const emailTab = document.getElementById('email-tab');
       const googleTab = document.getElementById('google-tab');
       const registerTab = document.getElementById('register-tab');
@@ -825,31 +801,41 @@
       }
       
       // Authentifizierungsstatus überwachen
-      onAuthStateChanged(window.firebaseAuth, async (user) => {
-  if (user) {
-    const { authorized, role } = await checkAuthorization(user);
-    
-    if (authorized) {
-      loginPage.classList.add('hidden');
-      appContent.classList.remove('hidden');
-      
-      // Optional: Add admin features based on role
-      if (role === 'admin') {
-        console.log('Admin user logged in');
-      }
-    } else {
-      loginError.textContent = "Access denied. Contact support.";
-      loginError.classList.remove('hidden');
-      await window.firebaseAuth.signOut();
-    }
-  } else {
-    loginPage.classList.remove('hidden');
-    appContent.classList.add('hidden');
-  }
-});
+      onAuthStateChanged(window.firebaseAuth, (user) => {
+        if (user) {
+          console.log('Angemeldet als:', user.email);
+          
+          // Prüfen, ob die E-Mail-Adresse autorisiert ist
+          if (isAuthorizedEmail(user.email)) {
+            // Autorisierter Benutzer - App anzeigen
+            loginPage.classList.add('hidden');
+            appContent.classList.remove('hidden');
+          } else {
+            // Nicht autorisierter Benutzer - Fehlermeldung anzeigen
+            loginError.textContent = "Sie sind nicht berechtigt, auf diese Anwendung zuzugreifen.";
+            loginError.classList.remove('hidden');
+            
+            // Benutzer abmelden
+            window.firebaseAuth.signOut();
+          }
+        } else {
+          // Benutzer ist nicht angemeldet - Login-Seite anzeigen
+          loginPage.classList.remove('hidden');
+          appContent.classList.add('hidden');
+        }
+      });
       
       // Event-Listener für den Google-Anmelde-Button
-
+      signInButton.addEventListener('click', () => {
+        loginError.classList.add('hidden');
+        const provider = new GoogleAuthProvider();
+        signInWithPopup(window.firebaseAuth, provider)
+          .catch((error) => {
+            console.error('Anmeldefehler:', error);
+            loginError.textContent = "Google-Anmeldefehler: " + error.message;
+            loginError.classList.remove('hidden');
+          });
+      });
       
       // Event-Listener für den E-Mail-Anmelde-Button
       emailSignInButton.addEventListener('click', () => {
@@ -881,72 +867,62 @@
       });
       
       // Event-Listener für den Registrierungs-Button
-registerButton.addEventListener('click', async () => {
-  loginError.classList.add('hidden');
-  const email = document.getElementById('reg-email').value;
-  const password = document.getElementById('reg-password').value;
-  const passwordConfirm = document.getElementById('reg-password-confirm').value;
-
-  // Basic validation
-  if (!email || !password || !passwordConfirm) {
-    loginError.textContent = "Bitte füllen Sie alle Felder aus";
-    loginError.classList.remove('hidden');
-    return;
-  }
-
-  if (password !== passwordConfirm) {
-    loginError.textContent = "Die Passwörter stimmen nicht überein";
-    loginError.classList.remove('hidden');
-    return;
-  }
-
-  if (password.length < 6) {
-    loginError.textContent = "Das Passwort muss mindestens 6 Zeichen lang sein";
-    loginError.classList.remove('hidden');
-    return;
-  }
-
-  // Firestore authorization check
-  try {
-    const normalizedEmail = email.toLowerCase();
-    const userDocRef = doc(window.firebaseDb, 'allowed_emails', normalizedEmail);
-    const userDoc = await getDoc(userDocRef);
-
-    if (!userDoc.exists()) {
-      loginError.textContent = "Diese E-Mail-Adresse ist nicht für die Registrierung zugelassen";
-      loginError.classList.remove('hidden');
-      return;
-    }
-  } catch (error) {
-    console.error('Registrierungsprüfung fehlgeschlagen:', error);
-    loginError.textContent = "Registrierungsdienst nicht verfügbar";
-    loginError.classList.remove('hidden');
-    return;
-  }
-
-  // Proceed with registration
-  createUserWithEmailAndPassword(window.firebaseAuth, email, password)
-    .then(() => {
-      console.log('Benutzer erfolgreich registriert');
-      setActiveTab(emailTab, emailLogin);
-      document.getElementById('email').value = email;
-    })
-    .catch((error) => {
-      console.error('Registrierungsfehler:', error);
-      let errorMessage = error.message;
-      
-      if (error.code === 'auth/email-already-in-use') {
-        errorMessage = "Ein Benutzerkonto mit dieser E-Mail-Adresse existiert bereits.";
-      } else if (error.code === 'auth/invalid-email') {
-        errorMessage = "Die E-Mail-Adresse ist ungültig.";
-      } else if (error.code === 'auth/weak-password') {
-        errorMessage = "Das Passwort ist zu schwach. Bitte wählen Sie ein stärkeres Passwort.";
-      }
-      
-      loginError.textContent = errorMessage;
-      loginError.classList.remove('hidden');
-    });
-});
+      registerButton.addEventListener('click', () => {
+        loginError.classList.add('hidden');
+        const email = document.getElementById('reg-email').value;
+        const password = document.getElementById('reg-password').value;
+        const passwordConfirm = document.getElementById('reg-password-confirm').value;
+        
+        if (!email || !password || !passwordConfirm) {
+          loginError.textContent = "Bitte füllen Sie alle Felder aus";
+          loginError.classList.remove('hidden');
+          return;
+        }
+        
+        if (password !== passwordConfirm) {
+          loginError.textContent = "Die Passwörter stimmen nicht überein";
+          loginError.classList.remove('hidden');
+          return;
+        }
+        
+        if (password.length < 6) {
+          loginError.textContent = "Das Passwort muss mindestens 6 Zeichen lang sein";
+          loginError.classList.remove('hidden');
+          return;
+        }
+        
+        // Vor der Registrierung prüfen, ob die E-Mail autorisiert ist
+        if (!isAuthorizedEmail(email)) {
+          loginError.textContent = "Diese E-Mail-Adresse ist nicht für die Registrierung zugelassen";
+          loginError.classList.remove('hidden');
+          return;
+        }
+        
+        createUserWithEmailAndPassword(window.firebaseAuth, email, password)
+          .then(() => {
+            // Registrierung erfolgreich
+            console.log('Benutzer erfolgreich registriert');
+            // Zurück zum Login-Tab wechseln
+            setActiveTab(emailTab, emailLogin);
+            document.getElementById('email').value = email;
+          })
+          .catch((error) => {
+            console.error('Registrierungsfehler:', error);
+            let errorMessage = error.message;
+            
+            // Benutzerfreundlichere Fehlermeldungen
+            if (error.code === 'auth/email-already-in-use') {
+              errorMessage = "Ein Benutzerkonto mit dieser E-Mail-Adresse existiert bereits.";
+            } else if (error.code === 'auth/invalid-email') {
+              errorMessage = "Die E-Mail-Adresse ist ungültig.";
+            } else if (error.code === 'auth/weak-password') {
+              errorMessage = "Das Passwort ist zu schwach. Bitte wählen Sie ein stärkeres Passwort.";
+            }
+            
+            loginError.textContent = errorMessage;
+            loginError.classList.remove('hidden');
+          });
+      });
       
       // Event-Listener für den Abmelde-Button
       signOutButton.addEventListener('click', () => {
