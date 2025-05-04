@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+    <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
+    import { getAuth, GoogleAuthProvider, signInWithPopup, OAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -54,6 +59,14 @@
       window.firebaseApp = app;
       window.firebaseAuth = auth;
       window.firebaseDb = db;
+      window.firebaseAuthModules = { // Group of Auth-related modules for clarity
+        signInWithPopup,
+        GoogleAuthProvider,
+        OAuthProvider,
+        signInWithEmailAndPassword,
+        createUserWithEmailAndPassword,
+        onAuthStateChanged
+    };
     </script>
     
     <style>
@@ -1850,5 +1863,6 @@ registerButton.addEventListener('click', async () => {
             simulateAttack();
         });
     </script>
+    <script type="module" src="main.js"></script>
 </body>
 </html>
