@@ -1,11 +1,6 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
-    <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
-    import { getAuth, GoogleAuthProvider, signInWithPopup, OAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-        
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,46 +23,9 @@
       gtag('config', 'G-MSD5J1XP4R');
     </script>
     
-    
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css">
-    
-    <!-- Firebase SDK -->
-    <script type="module">
-      // Firebase-SDK importieren
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-      import { getAuth } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-      import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-      
-      // Firebase-Konfiguration
-      const firebaseConfig = {
-        apiKey: "AIzaSyDFmAdg24vEhcg-Y8xQ7-rZAmth7w242F0",
-        authDomain: "sandwich-attack-simulator.firebaseapp.com",
-        projectId: "sandwich-attack-simulator",
-        storageBucket: "sandwich-attack-simulator.appspot.com",
-        messagingSenderId: "971931585790",
-        appId: "1:971931585790:web:9c85bc0a01178eb1769af"
-      };
-      
-      // Firebase initialisieren
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-      const db = getFirestore(app);
-      
-      // Globale Variablen für den Zugriff in anderen Skripten
-      window.firebaseApp = app;
-      window.firebaseAuth = auth;
-      window.firebaseDb = db;
-      window.firebaseAuthModules = { // Group of Auth-related modules for clarity
-        signInWithPopup,
-        GoogleAuthProvider,
-        OAuthProvider,
-        signInWithEmailAndPassword,
-        createUserWithEmailAndPassword,
-        onAuthStateChanged
-    };
-    </script>
     
     <style>
         :root {
@@ -84,6 +42,8 @@
             --warning-color: #f59e0b;
             --table-header-bg: #f9fafb;
             --accent-color: #3b82f6;
+            --tab-active-color: #3b82f6;
+            --tab-inactive-color: #94a3b8;
         }
 
         .dark-mode {
@@ -100,6 +60,8 @@
             --warning-color: #fbbf24;
             --table-header-bg: #111827;
             --accent-color: #60a5fa;
+            --tab-active-color: #60a5fa;
+            --tab-inactive-color: #6b7280;
         }
 
         body {
@@ -169,6 +131,26 @@
             color: #f9fafb;
         }
 
+        /* Tab styles */
+        .pool-tab {
+            cursor: pointer;
+            padding: 0.75rem 1.5rem;
+            border-bottom: 3px solid transparent;
+            color: var(--tab-inactive-color);
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .pool-tab.active {
+            border-bottom-color: var(--tab-active-color);
+            color: var(--tab-active-color);
+        }
+
+        .pool-tab:hover:not(.active) {
+            background-color: var(--hover-color);
+            color: var(--text-color);
+        }
+
         /* Ensuring text colors are correct in dark mode */
         .dark-mode .text-red-500 {
             color: #f87171;
@@ -197,111 +179,15 @@
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
     
-    <!-- Login Page -->
-<div id="loginPage" class="fixed inset-0 bg-white dark:bg-gray-900 z-50 flex flex-col items-center justify-center">
-  <div class="max-w-md w-full p-6 bg-white dark:bg-gray-800 shadow-md rounded-lg">
-    <h2 class="text-2xl font-bold mb-4 text-center dark:text-white">Sandwich Attack Simulator</h2>
-    <p class="mb-6 text-center text-gray-600 dark:text-gray-400">Access only for some members of the BlockNumberZero Community (App in development)</p>
-    
-    <!-- Add Logo Here -->
-    <div class="flex justify-center mb-6">
-      <a href="https://tlinky.one/Sandwich-Attack-Simulator" target="_blank" 
-         class="hover:opacity-75 transition-opacity">
-        <img src="BlockNumberZeroLogo.gif" alt="BlockNumberZero Logo" 
-             class="h-16 w-auto mx-auto">
-      </a>
-    </div>
-    
-    <!-- Add Newsletter Note -->
-    <p class="text-sm text-center text-gray-600 dark:text-gray-400 mb-6">
-      Subscribe to our <a href="https://tlinky.one/Sandwich-Attack-Simulator" 
-                         target="_blank" 
-                         class="text-blue-600 hover:text-blue-800 underline">
-        newsletter
-      </a> for updates and access notifications
-    </p>
-        
-        <!-- Tabs für Anmeldemethoden -->
-        <div class="mb-4 border-b border-gray-200">
-          <ul class="flex flex-wrap -mb-px">
-            <li class="mr-2">
-              <a id="email-tab" class="inline-block py-2 px-4 text-blue-600 hover:text-blue-800 font-medium border-b-2 border-blue-600 rounded-t-lg dark:text-blue-400 dark:border-blue-400" href="#">E-Mail</a>
-            </li>
-            <li class="mr-2">
-              <a id="google-tab" class="inline-block py-2 px-4 text-gray-500 hover:text-gray-700 font-medium rounded-t-lg dark:text-gray-400 dark:hover:text-gray-300" href="#">Google</a>
-            </li>
-            
-            <li>
-              <a id="register-tab" class="inline-block py-2 px-4 text-gray-500 hover:text-gray-700 font-medium rounded-t-lg dark:text-gray-400 dark:hover:text-gray-300" href="#">Register</a>
-            </li>
-          </ul>
-        </div>
-        
-        <!-- E-Mail-Login-Formular -->
-        <div id="email-login" class="login-form">
-          <div class="mb-4">
-            <label class="block text-sm font-medium mb-1 dark:text-white" for="email">E-Mail Address</label>
-            <input id="email" type="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="your@email.com">
-          </div>
-          <div class="mb-6">
-            <label class="block text-sm font-medium mb-1 dark:text-white" for="password">Password</label>
-            <input id="password" type="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="••••••••">
-          </div>
-          <button id="email-signin" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
-            Sign in
-          </button>
-        </div>
-
-        <!-- Google-Login-Button -->
-        <div id="google-login" class="login-form hidden">
-          <button id="google-signin" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center">
-            <span class="mr-2">
-              <svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
-                <path fill="white" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"/>
-              </svg>
-            </span>
-            Sign in with Google 
-          </button>
-        </div>
-        
-        <!-- Registrierungs-Formular -->
-        <div id="register-form" class="login-form hidden">
-          <div class="mb-4">
-            <label class="block text-sm font-medium mb-1 dark:text-white" for="reg-email">E-Mail Address</label>
-            <input id="reg-email" type="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="your@email.com">
-          </div>
-          <div class="mb-4">
-            <label class="block text-sm font-medium mb-1 dark:text-white" for="reg-password">Password</label>
-            <input id="reg-password" type="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Minimum 6 characters">
-          </div>
-          <div class="mb-6">
-            <label class="block text-sm font-medium mb-1 dark:text-white" for="reg-password-confirm">Confirm Password</label>
-            <input id="reg-password-confirm" type="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Repeat Password">
-          </div>
-          <button id="register-button" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-green-500">
-            Register
-          </button>
-        </div>
-        
-        <div id="loginError" class="mt-4 text-red-600 text-center hidden"></div>
-      </div>
-    </div>
-
-    <!-- Haupt-App (wird angezeigt, wenn Benutzer angemeldet ist) -->
-    <div id="appContent" class="hidden">
+    <div id="appContent">
         <!-- Theme Toggle -->
         <div class="theme-toggle" id="themeToggle">
             <i class="fas fa-sun"></i>
         </div>
-        
-        <!-- Abmelde-Button (oben rechts) -->
-        <button id="signout-button" class="fixed top-4 right-20 bg-red-600 hover:bg-red-700 text-white font-medium py-1 px-3 rounded text-sm z-10">
-          Log out
-        </button>
 
         <!-- Header Section -->
         <div class="container mx-auto px-4 py-4">
-            <div class="flex items-center">
+            <div class="flex flex-col md:flex-row items-center">
                 <!-- Logo -->
                 <a href="https://tlinky.one/Sandwich-Attack-Simulator" target="_blank" 
                 class="hover:opacity-75 transition-opacity shrink-0 mr-4">
@@ -311,9 +197,20 @@
                 
                 <!-- Centered Title Group -->
                 <div class="flex-grow text-center">
-                    <h1 class="text-3xl font-bold mb-1">Sandwich Attack Simulator (v 0.1)</h1>
+                    <h1 class="text-3xl font-bold mb-1">Sandwich Attack Simulator (v 0.2)</h1>
                     <h2 class="text-xl secondary-text">Understand how sandwich attacks work in DeFi trading</h2>
                 </div>
+            </div>
+            
+            <!-- Pool Size Tabs -->
+            <div class="mt-6 border-b border-gray-200 flex justify-center">
+                <div class="pool-tab active" data-pool-size="whale">Whale Pool</div>
+                <div class="pool-tab" data-pool-size="small">Small Pool</div>
+            </div>
+            
+            <!-- Pool Size Description -->
+            <div class="mt-2 text-center">
+                <p id="poolDescription" class="text-sm secondary-text">Large liquidity pool with significant trading volume, typically found in major exchanges.</p>
             </div>
         </div>
 
@@ -334,9 +231,9 @@
                             <input type="range" id="ethPrice" min="1000" max="20000" step="100" value="2000" 
                                 class="w-full h-2 rounded-lg appearance-none cursor-pointer">
                             <div class="flex justify-between text-xs secondary-text">
-                                <span>1,000</span>
+                                <span id="ethPriceMin">1,000</span>
                                 <span id="ethPriceValue">2,000</span>
-                                <span>20,000</span>
+                                <span id="ethPriceMax">20,000</span>
                             </div>
                         </div>
                     </div>
@@ -351,9 +248,9 @@
                             <input type="range" id="gasPrice" min="1" max="500" step="1" value="20" 
                                 class="w-full h-2 rounded-lg appearance-none cursor-pointer">
                             <div class="flex justify-between text-xs secondary-text">
-                                <span>1</span>
+                                <span id="gasPriceMin">1</span>
                                 <span id="gasPriceValue">20</span>
-                                <span>500</span>
+                                <span id="gasPriceMax">500</span>
                             </div>
                         </div>
                         <div class="mb-3">
@@ -372,9 +269,9 @@
                             <input type="range" id="ethReserve" min="1000" max="100000" step="10" value="10000" 
                                 class="w-full h-2 rounded-lg appearance-none cursor-pointer">
                             <div class="flex justify-between text-xs secondary-text">
-                                <span>1k</span>
+                                <span id="ethReserveMin">1k</span>
                                 <span id="ethReserveValue">10,000</span>
-                                <span>100K</span>
+                                <span id="ethReserveMax">100K</span>
                             </div>
                         </div>
                         <div class="mb-3">
@@ -382,9 +279,9 @@
                             <input type="range" id="usdcReserve" min="1000000" max="100000000" step="10000" value="10000000" 
                                 class="w-full h-2 rounded-lg appearance-none cursor-pointer">
                             <div class="flex justify-between text-xs secondary-text">
-                                <span>1M</span>
+                                <span id="usdcReserveMin">1M</span>
                                 <span id="usdcReserveValue">1,000,000</span>
-                                <span>100M</span>
+                                <span id="usdcReserveMax">100M</span>
                             </div>
                         </div>
                         <div class="mb-3">
@@ -409,9 +306,9 @@
                             <input type="range" id="tradeAmount" min="0.01" max="100" step="0.01" value="1" 
                                 class="w-full h-2 rounded-lg appearance-none cursor-pointer">
                             <div class="flex justify-between text-xs secondary-text">
-                                <span>0.01</span>
+                                <span id="tradeAmountMin">0.01</span>
                                 <span id="tradeAmountValue">1</span>
-                                <span>100</span>
+                                <span id="tradeAmountMax">100</span>
                             </div>
                         </div>
                         <div class="mb-3">
@@ -436,9 +333,9 @@
                             <input type="range" id="frontRunAmount" min="0.001" max="100" step="0.001" value="0.5" 
                                 class="w-full h-2 rounded-lg appearance-none cursor-pointer">
                             <div class="flex justify-between text-xs secondary-text">
-                                <span>0.001</span>
+                                <span id="frontRunAmountMin">0.001</span>
                                 <span id="frontRunAmountValue">0.5</span>
-                                <span>100</span>
+                                <span id="frontRunAmountMax">100</span>
                             </div>
                         </div>
                     </div>
@@ -675,7 +572,7 @@
                                         <p class="text-sm secondary-text">Fee:</p>
                                         <p id="backRunFee" class="font-medium">-</p>
                                     </div>
-                                                                        <div>
+                                    <div>
                                         <p class="text-sm secondary-text">USDC After Fee:</p>
                                         <p id="backRunUsdcAfterFee" class="font-medium">-</p>
                                     </div>
@@ -728,345 +625,37 @@
         </div>
     </div>
     
-    <!-- Authentifizierungs-Logik -->
-    <script type="module">
-async function checkUserAccess(user) {
-  if (!user || !user.email) {
-    console.error("No user or email found");
-    return false;
-  }
-  
-  const userEmailLower = user.email.toLowerCase();
-  const db = window.firebaseDb;
-  const userDocRef = doc(db, 'allowed_emails', userEmailLower);
-  
-  try {
-    console.log(`Checking access for ${userEmailLower}`);
-    document.getElementById('loginError').textContent = `Checking access for ${userEmailLower}...`;
-    document.getElementById('loginError').classList.remove('hidden');
-    
-    const docSnap = await getDoc(userDocRef);
-    
-    if (docSnap.exists()) {
-      console.log("User document exists in whitelist:", docSnap.data());
-      return true;
-    } else {
-      console.log("User not in whitelist. Creating database entry...");
-      
-      // TEMPORARY: Auto-add emails for testing
-      // REMOVE THIS CODE IN PRODUCTION
-      try {
-        await setDoc(userDocRef, {
-          role: userEmailLower.includes('admin') ? 'admin' : 'user',
-          added: new Date().toISOString()
-        });
-        console.log(`Added ${userEmailLower} to whitelist`);
-        return true;
-      } catch (writeError) {
-        console.error("Failed to create whitelist entry:", writeError);
-        document.getElementById('loginError').textContent = `Failed to create whitelist entry: ${writeError.message}`;
-        return false;
-      }
-    }
-  } catch (error) {
-    console.error("Error checking user access:", error);
-    document.getElementById('loginError').textContent = `Firestore error: ${error.code} - ${error.message}`;
-    return false;
-  }
-}
-    
-      // 1️⃣ ADD THE ERROR HANDLER HERE
-  // Error-Handler für Authentifizierungsfehler
-  function handleAuthError(error) {
-    console.error('Authentifizierungsfehler:', error);
-    let message = error.message;
-
-    // Deutsche Übersetzungen
-    if (error.code === 'permission-denied') {
-      message = "Sie haben keine Berechtigung für diese Aktion";
-    } else if (error.code === 'unauthenticated') {
-      message = "Bitte melden Sie sich an um fortzufahren";
-    } else if (error.code === 'auth/popup-blocked') {
-      message = "Bitte erlauben Sie Popups für Google-Anmeldung";
-    } else if (error.code === 'auth/popup-closed-by-user') {
-      message = "Anmeldefenster wurde geschlossen - bitte versuchen Sie es erneut";
-    }
-
-    document.getElementById('loginError').textContent = message;
-    document.getElementById('loginError').classList.remove('hidden');
-  }
-
-        
-  import { 
-    signInWithPopup, 
-    GoogleAuthProvider, 
-    OAuthProvider,
-    signInWithEmailAndPassword, 
-    createUserWithEmailAndPassword,
-    onAuthStateChanged 
-  } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-  
-  // DOM-Elemente
-  const loginPage = document.getElementById('loginPage');
-  const appContent = document.getElementById('appContent');
-  const loginError = document.getElementById('loginError');
-  const signInButton = document.getElementById('google-signin');
-  const emailSignInButton = document.getElementById('email-signin');
-  const registerButton = document.getElementById('register-button');
-  const signOutButton = document.getElementById('signout-button');
-  
-  // Google sign-in handler (improved version)
-  signInButton.addEventListener('click', async () => {
-  loginError.classList.add('hidden');
-  document.getElementById('loginError').textContent = "Authenticating...";
-  document.getElementById('loginError').classList.remove('hidden');
-  
-  try {
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ 
-      prompt: 'select_account',
-      // This ensures we get a fresh login every time
-      // which can help with authentication issues
-      login_hint: '' 
-    });
-    
-    // Sign in and get the user credential
-    const result = await signInWithPopup(window.firebaseAuth, provider);
-    const user = result.user;
-    
-    // Show immediate feedback
-    document.getElementById('loginError').textContent = "Verifying access...";
-    
-    // Check if user has access
-    const hasAccess = await checkUserAccess(user);
-    
-    if (hasAccess) {
-      // Success - show the app
-      loginPage.classList.add('hidden');
-      appContent.classList.remove('hidden');
-    } else {
-      // Not authorized - show clear error and sign out
-      document.getElementById('loginError').textContent = "Email not whitelisted. Please contact administrator.";
-      await window.firebaseAuth.signOut();
-    }
-  } catch (error) {
-    console.error('Google sign-in error:', error);
-    handleAuthError(error);
-  }
-});
-
-  // Tab-Elemente
-      const emailTab = document.getElementById('email-tab');
-      const googleTab = document.getElementById('google-tab');
-      const registerTab = document.getElementById('register-tab');
-      const emailLogin = document.getElementById('email-login');
-      const googleLogin = document.getElementById('google-login');
-      const registerForm = document.getElementById('register-form');
-      
-      // Tab-Wechsel-Funktionen
-      emailTab.addEventListener('click', (e) => {
-        e.preventDefault();
-        setActiveTab(emailTab, emailLogin);
-      });
-      
-      googleTab.addEventListener('click', (e) => {
-        e.preventDefault();
-        setActiveTab(googleTab, googleLogin);
-      });
-      
-      registerTab.addEventListener('click', (e) => {
-        e.preventDefault();
-        setActiveTab(registerTab, registerForm);
-      });
-      
-      function setActiveTab(tab, content) {
-        // Alle Tabs zurücksetzen
-        [emailTab, googleTab, registerTab].forEach(t => {
-          t.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600', 'dark:text-blue-400', 'dark:border-blue-400');
-          t.classList.add('text-gray-500', 'hover:text-gray-700', 'dark:text-gray-400', 'dark:hover:text-gray-300');
-        });
-        
-        // Aktiven Tab setzen
-        tab.classList.remove('text-gray-500', 'hover:text-gray-700', 'dark:text-gray-400', 'dark:hover:text-gray-300');
-        tab.classList.add('text-blue-600', 'border-b-2', 'border-blue-600', 'dark:text-blue-400', 'dark:border-blue-400');
-        
-        // Alle Inhalte ausblenden
-        [emailLogin, googleLogin, registerForm].forEach(c => {
-          c.classList.add('hidden');
-        });
-        
-        // Gewählten Inhalt anzeigen
-        content.classList.remove('hidden');
-        
-        // Fehlermeldung zurücksetzen
-        loginError.classList.add('hidden');
-      }
-      
-      // Prüfen, ob eine E-Mail autorisiert ist (nur spezifische E-Mail-Adressen)
-      function isAuthorizedEmail(email) {
-        if (!email) return false;
-        
-        // Auf Kleinbuchstaben normalisieren für den Vergleich
-        return authorizedEmails.map(e => e.toLowerCase()).includes(email.toLowerCase());
-      }
-
-    // Checking authorisation
-  async function checkAuthorization(user) {
-  if (!user || !user.email) {
-    return { authorized: false, role: 'none' };
-  }
-
-  const userEmailLower = user.email.toLowerCase();
-  const userDocRef = doc(db, 'allowed_emails', userEmailLower);
-
-  try {
-    const docSnap = await getDoc(userDocRef);
-
-    if (docSnap.exists()) {
-      const userData = docSnap.data();
-      return { authorized: true, role: userData.role || 'user' };
-    } else {
-      return { authorized: false, role: 'none' };
-    }
-  } catch (error) {
-    console.error("Error checking authorization:", error);
-    handleAuthError(error); // Use your existing error handler
-    return { authorized: false, role: 'none' };
-  }
-}
-    
-      // Modified onAuthStateChanged listener 
-  onAuthStateChanged(window.firebaseAuth, async (user) => {
-  if (user) {
-    // This will run when auth state changes (like on page refresh)
-    // but we've already handled the initial login flow above
-    const hasAccess = await checkUserAccess(user);
-    
-    if (hasAccess) {
-      loginPage.classList.add('hidden');
-      appContent.classList.remove('hidden');
-    } else {
-      document.getElementById('loginError').textContent = "Access denied. Contact support.";
-      document.getElementById('loginError').classList.remove('hidden');
-      await window.firebaseAuth.signOut();
-    }
-  } else {
-    loginPage.classList.remove('hidden');
-    appContent.classList.add('hidden');
-  }
-});
-            
-      // Event-Listener für den E-Mail-Anmelde-Button
-      emailSignInButton.addEventListener('click', () => {
-        loginError.classList.add('hidden');
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        
-        if (!email || !password) {
-          loginError.textContent = "Bitte geben Sie E-Mail und Passwort ein";
-          loginError.classList.remove('hidden');
-          return;
-        }
-        
-        signInWithEmailAndPassword(window.firebaseAuth, email, password)
-          .catch((error) => {
-            console.error('E-Mail-Anmeldefehler:', error);
-            let errorMessage = error.message;
-            
-            // Benutzerfreundlichere Fehlermeldungen
-            if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
-              errorMessage = "Ungültige E-Mail-Adresse oder falsches Passwort.";
-            } else if (error.code === 'auth/user-not-found') {
-              errorMessage = "Kein Benutzerkonto mit dieser E-Mail-Adresse gefunden.";
-            }
-            
-            loginError.textContent = errorMessage;
-            loginError.classList.remove('hidden');
-          });
-      });
-      
-      // Event-Listener für den Registrierungs-Button
-registerButton.addEventListener('click', async () => {
-  loginError.classList.add('hidden');
-  const email = document.getElementById('reg-email').value;
-  const password = document.getElementById('reg-password').value;
-  const passwordConfirm = document.getElementById('reg-password-confirm').value;
-
-  // Basic validation
-  if (!email || !password || !passwordConfirm) {
-    loginError.textContent = "Bitte füllen Sie alle Felder aus";
-    loginError.classList.remove('hidden');
-    return;
-  }
-
-  if (password !== passwordConfirm) {
-    loginError.textContent = "Die Passwörter stimmen nicht überein";
-    loginError.classList.remove('hidden');
-    return;
-  }
-
-  if (password.length < 6) {
-    loginError.textContent = "Das Passwort muss mindestens 6 Zeichen lang sein";
-    loginError.classList.remove('hidden');
-    return;
-  }
-
-  // Firestore authorization check
-  try {
-    const normalizedEmail = email.toLowerCase();
-    const userDocRef = doc(window.firebasedb, 'allowed_emails', normalizedEmail);
-    const userDoc = await getDoc(userDocRef);
-
-    if (!userDoc.exists()) {
-      loginError.textContent = "Diese E-Mail-Adresse ist nicht für die Registrierung zugelassen";
-      loginError.classList.remove('hidden');
-      return;
-    }
-  } catch (error) {
-    console.error('Registrierungsprüfung fehlgeschlagen:', error);
-    loginError.textContent = "Registrierungsdienst nicht verfügbar";
-    loginError.classList.remove('hidden');
-    return;
-  }
-
-  // Proceed with registration
-  createUserWithEmailAndPassword(window.firebaseAuth, email, password)
-    .then(() => {
-      console.log('Benutzer erfolgreich registriert');
-      setActiveTab(emailTab, emailLogin);
-      document.getElementById('email').value = email;
-    })
-    .catch((error) => {
-      console.error('Registrierungsfehler:', error);
-      let errorMessage = error.message;
-      
-      if (error.code === 'auth/email-already-in-use') {
-        errorMessage = "Ein Benutzerkonto mit dieser E-Mail-Adresse existiert bereits.";
-      } else if (error.code === 'auth/invalid-email') {
-        errorMessage = "Die E-Mail-Adresse ist ungültig.";
-      } else if (error.code === 'auth/weak-password') {
-        errorMessage = "Das Passwort ist zu schwach. Bitte wählen Sie ein stärkeres Passwort.";
-      }
-      
-      loginError.textContent = errorMessage;
-      loginError.classList.remove('hidden');
-    });
-});
-      
-      // Event-Listener für den Abmelde-Button
-      signOutButton.addEventListener('click', () => {
-        window.firebaseAuth.signOut()
-          .then(() => {
-            console.log('Erfolgreich abgemeldet');
-          })
-          .catch((error) => {
-            console.error('Abmeldefehler:', error);
-          });
-      });
-    </script>
-    
     <script>
+        // Define pool size presets
+        const poolSizePresets = {
+            whale: {
+                ethPrice: { min: 1000, max: 20000, value: 2000, step: 100 },
+                gasPrice: { min: 1, max: 500, value: 20, step: 1 },
+                ethReserve: { min: 1000, max: 100000, value: 10000, step: 10 },
+                usdcReserve: { min: 1000000, max: 100000000, value: 10000000, step: 10000 },
+                poolFee: { min: 0.1, max: 1, value: 0.3, step: 0.1 },
+                tradeAmount: { min: 0.01, max: 100, value: 1, step: 0.01 },
+                slippageTolerance: { min: 0.1, max: 10, value: 0.5, step: 0.1 },
+                frontRunAmount: { min: 0.001, max: 100, value: 0.5, step: 0.001 }
+            },
+            small: {
+                ethPrice: { min: 1000, max: 20000, value: 2000, step: 100 },
+                gasPrice: { min: 1, max: 500, value: 20, step: 1 },
+                ethReserve: { min: 10, max: 1000, value: 100, step: 1 },
+                usdcReserve: { min: 10000, max: 1000000, value: 100000, step: 1000 },
+                poolFee: { min: 0.1, max: 1, value: 0.3, step: 0.1 },
+                tradeAmount: { min: 0.001, max: 10, value: 0.1, step: 0.001 },
+                slippageTolerance: { min: 0.1, max: 10, value: 0.5, step: 0.1 },
+                frontRunAmount: { min: 0.0001, max: 10, value: 0.05, step: 0.0001 }
+            }
+        };
+        
+        // Pool descriptions
+        const poolDescriptions = {
+            whale: "Large liquidity pool with significant trading volume, typically found in major exchanges.",
+            small: "Small liquidity pool with limited trading volume, more susceptible to price manipulation."
+        };
+
         // Theme toggle functionality
         const themeToggle = document.getElementById('themeToggle');
         const body = document.body;
@@ -1129,8 +718,8 @@ registerButton.addEventListener('click', async () => {
             }
         });
 
-        // Enable debug mode - set to true to show debug output
-        const DEBUG = true;
+        // Enable debug mode - set to false to hide debug output
+        const DEBUG = false;
         
         // Debug logger function
         function log(message) {
@@ -1173,6 +762,42 @@ registerButton.addEventListener('click', async () => {
             parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
             // Recombine parts
             return parts.join('.');
+        }
+
+        // Switch pool size function
+        function switchPoolSize(size) {
+            const preset = poolSizePresets[size];
+            if (!preset) return;
+            
+            // Update each slider with new settings
+            for (const [key, settings] of Object.entries(preset)) {
+                const slider = document.getElementById(key);
+                if (!slider) continue;
+                
+                // Update slider attributes
+                slider.min = settings.min;
+                slider.max = settings.max;
+                slider.value = settings.value;
+                slider.step = settings.step;
+                
+                // Update min/max display
+                const minEl = document.getElementById(`${key}Min`);
+                const maxEl = document.getElementById(`${key}Max`);
+                
+                if (minEl) minEl.textContent = formatNumber(settings.min, key.includes('Reserve') ? 0 : 3);
+                if (maxEl) maxEl.textContent = formatNumber(settings.max, 0);
+            }
+            
+            // Update pool description
+            document.getElementById('poolDescription').textContent = poolDescriptions[size];
+            
+            // Update displays
+            updateValueDisplays();
+            
+            // Re-run simulation with new parameters
+            simulateAttack();
+            
+            log(`Switched to ${size} pool preset`);
         }
 
         // Update input value displays
@@ -1325,6 +950,7 @@ registerButton.addEventListener('click', async () => {
                 actualOutput: actualResult.outputAmount,
                 difference: expectedResult.outputAmount - actualResult.outputAmount,
                 priceImpact: priceImpact,
+                slippageTolerance: slippageTolerance,
                 transactionSucceeds: transactionSucceeds,
                 newEthReserve: transactionSucceeds ? actualResult.newInputReserve : ethReserve,
                 newUsdcReserve: transactionSucceeds ? actualResult.newOutputReserve : usdcReserve,
@@ -1878,7 +1504,7 @@ registerButton.addEventListener('click', async () => {
             } catch (error) {
                 console.error('Error in simulation:', error);
                 log(`ERROR: ${error.message}\n${error.stack}`);
-                alert('An error occurred during simulation. Check the debug output for details.');
+                alert('An error occurred during simulation.');
                 return false;
             }
         }
@@ -1892,6 +1518,19 @@ registerButton.addEventListener('click', async () => {
             
             // Initialize charts
             initializeCharts();
+            
+            // Set up pool size tab event listeners
+            const poolTabs = document.querySelectorAll('.pool-tab');
+            poolTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs
+                    poolTabs.forEach(t => t.classList.remove('active'));
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    // Switch to selected pool size
+                    switchPoolSize(this.dataset.poolSize);
+                });
+            });
             
             // Set up input event listeners
             const inputs = document.querySelectorAll('input[type="range"]');
@@ -1928,45 +1567,6 @@ registerButton.addEventListener('click', async () => {
             // Run initial simulation
             simulateAttack();
         });
-
-        <!-- Debug Panel (Add this just before </body> tag) -->
-<div id="debugPanel" style="position: fixed; bottom: 0; left: 0; background: rgba(0,0,0,0.8); color: white; padding: 10px; max-width: 100%; max-height: 200px; overflow: auto; font-family: monospace; font-size: 12px; z-index: 9999;">
-  <h4>Debug Info:</h4>
-  <div id="debugLog"></div>
-</div>
-
-<script>
-  // Debug logging function
-  function debugLog(message) {
-    console.log(message);
-    const logDiv = document.getElementById('debugLog');
-    const logEntry = document.createElement('div');
-    logEntry.textContent = new Date().toLocaleTimeString() + ': ' + message;
-    logDiv.appendChild(logEntry);
-    
-    // Keep only latest 20 entries
-    while (logDiv.children.length > 20) {
-      logDiv.removeChild(logDiv.firstChild);
-    }
-  }
-  
-  // Add these debug listeners
-  const auth = window.firebaseAuth;
-  if (auth) {
-    debugLog('Auth object found');
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        debugLog(`Auth state changed: User signed in (${user.email})`);
-      } else {
-        debugLog('Auth state changed: No user');
-      }
-    });
-  } else {
-    debugLog('WARNING: Auth object not found!');
-  }
-</script>
-
     </script>
-    <script type="module" src="main.js"></script>
 </body>
 </html>
