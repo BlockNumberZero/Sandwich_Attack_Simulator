@@ -749,33 +749,76 @@ const poolSizePresets = {
             }
         }
 
-        // Corrected number formatting function
-        function formatNumber(num, decimals = 4) {
-            if (num === undefined || num === null || isNaN(num)) return '-';
-            
-            // For very small numbers near zero
-            if (Math.abs(num) < 0.0001 && num !== 0) {
-                return num.toExponential(4);
-            }
-            
-            // Handle different formats based on size
-            let formatted;
-            if (Math.abs(num) >= 1000000) {
-                formatted = (num / 1000000).toFixed(2) + 'M';
-            } else if (Math.abs(num) >= 1000) {
-                formatted = (num / 1000).toFixed(2) + 'K';
-            } else {
-                formatted = num.toFixed(decimals);
-            }
-            
-            // Split into integer and decimal parts
-            const parts = formatted.split('.');
-            // Add commas only to the integer part
-            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-            // Recombine parts
-            return parts.join('.');
+// Corrected number formatting function
+function formatNumber(num, decimals = 4) {
+    if (num === undefined || num === null || isNaN(num)) return '-';
+    
+    // For very small numbers near zero
+    if (Math.abs(num) < 0.0001 && num !== 0) {
+        return num.toExponential(4);
+    }
+    
+    // Handle different formats based on size
+    let formatted;
+    if (Math.abs(num) >= 1000000) {
+        // For millions, only show decimals if not a whole number
+        if (Math.abs(num) % 1000000 < 1) {
+            formatted = (num / 1000000).toFixed(0) + 'M';
+        } else {
+            formatted = (num / 1000000).toFixed(2) + 'M';
+            // Remove trailing zeros
+            formatted = formatted.replace(/\.0+M$/, 'M').replace(/(\.\d+?)0+M$/, '$1M');
         }
+    } else if (Math.abs(num) >= 1000) {
+        // For thousands, only show decimals if not a whole number
+        if (Math.abs(num) % 1000 < 1) {
+            formatted = (num / 1000).toFixed(0) + 'K';
+        } else {
+            formatted = (num / 1000).toFixed(2) + 'K';
+            // Remove trailing zeros
+            formatted = formatted.replace(/\.0+K$/, 'K').replace(/(\.\d+?)0+K$/, '$1K');
+        }
+    } else {
+        formatted = num.toFixed(decimals);
+        // Remove trailing zeros after decimal point
+        if (formatted.includes('.')) {
+            formatted = formatted.replace(/\.0+$/, '').replace(/(\.\d+?)0+$/, '$1');
+        }
+    }
+    
+    // Split into integer and decimal parts
+    const parts = formatted.split('.');
+    // Add commas only to the integer part
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    // Recombine parts
+    return parts.join('.');
+}
 
+
+        // Update min/max displays for the current pool
+function updateMinMaxDisplays() {
+    // Get the active pool size
+    const activeTab = document.querySelector('.pool-tab.active');
+    if (!activeTab) return;
+    
+    const poolSize = activeTab.dataset.poolSize;
+    const preset = poolSizePresets[poolSize];
+    if (!preset) return;
+    
+    // Update min/max displays for each parameter
+    for (const [key, settings] of Object.entries(preset)) {
+        const minEl = document.getElementById(`${key}Min`);
+        const maxEl = document.getElementById(`${key}Max`);
+        
+        if (minEl) minEl.textContent = formatNumber(settings.min, key.includes('Reserve') ? 0 : 3);
+        if (maxEl) maxEl.textContent = formatNumber(settings.max, 0);
+    }
+    
+    log('Updated min/max displays for ' + poolSize + ' pool');
+}
+
+
+        
         // Switch pool size function
         function switchPoolSize(size) {
             const preset = poolSizePresets[size];
@@ -793,18 +836,21 @@ const poolSizePresets = {
                 slider.step = settings.step;
                 
                 // Update min/max display
-                const minEl = document.getElementById(`${key}Min`);
-                const maxEl = document.getElementById(`${key}Max`);
+                //const minEl = document.getElementById(`${key}Min`);
+                //const maxEl = document.getElementById(`${key}Max`);
                 
-                if (minEl) minEl.textContent = formatNumber(settings.min, key.includes('Reserve') ? 0 : 3);
-                if (maxEl) maxEl.textContent = formatNumber(settings.max, 0);
-            }
+                //if (minEl) minEl.textContent = formatNumber(settings.min, key.includes('Reserve') ? 0 : 3);
+                //if (maxEl) maxEl.textContent = formatNumber(settings.max, 0);
+            } 
             
             // Update pool description
             document.getElementById('poolDescription').textContent = poolDescriptions[size];
             
             // Update displays
             updateValueDisplays();
+
+            // Update min/max displays -LINE ADDED
+            updateMinMaxDisplays();
             
             // Re-run simulation with new parameters
             simulateAttack();
@@ -1522,14 +1568,17 @@ const poolSizePresets = {
         }
 
         // Initialize the application
-        document.addEventListener('DOMContentLoaded', function() {
-            log('Application initializing');
-            
-            // Update all value displays
-            updateValueDisplays();
-            
-            // Initialize charts
-            initializeCharts();
+document.addEventListener('DOMContentLoaded', function() {
+    log('Application initializing');
+    
+    // Update all value displays
+    updateValueDisplays();
+    
+    // Update min/max displays for current pool - ADD THIS LINE
+    updateMinMaxDisplays();
+    
+    // Initialize charts
+    initializeCharts();
             
             // Set up pool size tab event listeners
             const poolTabs = document.querySelectorAll('.pool-tab');
