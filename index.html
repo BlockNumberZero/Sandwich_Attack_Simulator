@@ -1572,13 +1572,37 @@ document.addEventListener('DOMContentLoaded', function() {
     log('Application initializing');
     
     // Update all value displays
-    updateValueDisplays();
+    //updateValueDisplays();
     
     // Update min/max displays for current pool - ADD THIS LINE
-    updateMinMaxDisplays();
+    //updateMinMaxDisplays();
     
     // Initialize charts
     initializeCharts();
+
+    // ADD THESE LINES START
+    // Determine the initially active pool
+    const initialActiveTab = document.querySelector('.pool-tab.active');
+    let initialPoolSize = 'whale'; // Default to 'whale' if not found
+    if (initialActiveTab && initialActiveTab.dataset.poolSize) {
+        initialPoolSize = initialActiveTab.dataset.poolSize;
+    }
+
+    // Apply the preset for the initial pool size.
+    // This function will also take care of updating value displays, min/max labels,
+    // and running the initial simulation.
+    if (poolSizePresets[initialPoolSize]) {
+        switchPoolSize(initialPoolSize);
+    } else {
+        // Fallback if the preset isn't found (should not happen with 'whale' or 'small')
+        // If you uncommented the lines above, you might want to call them here as a fallback.
+        console.error('Initial pool preset not found:', initialPoolSize, '- falling back to manual init.');
+        // For safety, if you want a fallback to original partial init:
+        // updateValueDisplays(); 
+        // updateMinMaxDisplays();
+        // simulateAttack(); // (at the end of this block)
+    }
+    // ADD THESE LINES END
             
             // Set up pool size tab event listeners
             const poolTabs = document.querySelectorAll('.pool-tab');
@@ -1626,7 +1650,7 @@ document.addEventListener('DOMContentLoaded', function() {
             log('Application initialized successfully');
             
             // Run initial simulation
-            simulateAttack();
+            //simulateAttack();
         });
     </script>
 </body>
