@@ -638,28 +638,29 @@
     
     <script>
         // Define pool size presets
-        const poolSizePresets = {
-            whale: {
-                ethPrice: { min: 1000, max: 20000, value: 2000, step: 100 },
-                gasPrice: { min: 1, max: 500, value: 20, step: 1 },
-                ethReserve: { min: 1000, max: 100000, value: 10000, step: 10 },
-                usdcReserve: { min: 1000000, max: 100000000, value: 10000000, step: 10000 },
-                poolFee: { min: 0.1, max: 1, value: 0.3, step: 0.1 },
-                tradeAmount: { min: 0.01, max: 100, value: 1, step: 0.01 },
-                slippageTolerance: { min: 0.1, max: 10, value: 0.5, step: 0.1 },
-                frontRunAmount: { min: 0.001, max: 100, value: 0.5, step: 0.001 }
-            },
-            small: {
-                ethPrice: { min: 1000, max: 20000, value: 2000, step: 100 },
-                gasPrice: { min: 1, max: 500, value: 20, step: 1 },
-                ethReserve: { min: 10, max: 1000, value: 100, step: 1 },
-                usdcReserve: { min: 10000, max: 1000000, value: 100000, step: 1000 },
-                poolFee: { min: 0.1, max: 1, value: 0.3, step: 0.1 },
-                tradeAmount: { min: 0.001, max: 10, value: 0.1, step: 0.001 },
-                slippageTolerance: { min: 0.1, max: 10, value: 0.5, step: 0.1 },
-                frontRunAmount: { min: 0.0001, max: 10, value: 0.05, step: 0.0001 }
-            }
-        };
+const poolSizePresets = {
+    whale: {
+        ethPrice: { min: 1000, max: 20000, value: 2000, step: 100 },
+        gasPrice: { min: 1, max: 500, value: 20, step: 1 },
+        ethReserve: { min: 1000, max: 100000, value: 10000, step: 10 },
+        usdcReserve: { min: 1000000, max: 100000000, value: 10000000, step: 10000 },
+        poolFee: { min: 0.1, max: 1, value: 0.3, step: 0.1 },
+        tradeAmount: { min: 10, max: 10000, value: 100, step: 1 },
+        slippageTolerance: { min: 0.1, max: 10, value: 0.5, step: 0.1 },
+        frontRunAmount: { min: 10, max: 10000, value: 50, step: 1 }
+    },
+    small: {
+        ethPrice: { min: 1000, max: 20000, value: 2000, step: 100 },
+        gasPrice: { min: 1, max: 500, value: 20, step: 1 },
+        ethReserve: { min: 10, max: 1000, value: 100, step: 1 },
+        usdcReserve: { min: 10000, max: 1000000, value: 100000, step: 1000 },
+        poolFee: { min: 0.1, max: 1, value: 0.3, step: 0.1 },
+        tradeAmount: { min: 0.01, max: 10, value: 0.1, step: 0.001 },
+        slippageTolerance: { min: 0.1, max: 10, value: 0.5, step: 0.1 },
+        frontRunAmount: { min: 0.01, max: 10, value: 0.05, step: 0.001 }
+    }
+};
+
         
         // Pool descriptions
         const poolDescriptions = {
